@@ -10,11 +10,14 @@ import Code from '../constants/ColorCodes';
 // Dashboard
 import DashboardScreen from '../screens/dashboard/dashboard.screen';
 
-// Operation
-// import OperationScreen from '../screens/operation/operations-menu/operations.menu.screen';
+//Products
+import ProductsScreen from '../screens/products/products.screen';
 
-// Setting
-// import SettingsScreen from '../screens/setttings/settings.screen';
+// Orders
+import OrdersScreen from '../screens/orders/orders.screen';
+
+// Profile
+import ProfileScreen from '../screens/profile/profile.screen';
 
 const headBarStyle = {
   headerTitle: '', headerStyle: {  height: 40, backgroundColor: Code.primary }, headerLeft: () => null,
@@ -45,37 +48,46 @@ function DashboardTabNavigator() {
   );
 }
 
-// Operation
-const OperationStack = createStackNavigator();
-function TabOperationNavigator() {
+// Products
+const ProductsStack = createStackNavigator();
+function TabProductsNavigator() {
   return (
-    <OperationStack.Navigator>
-      <OperationStack.Screen
-        name="Operation"
-        component={OperationScreen}
+    <ProductsStack.Navigator>
+      <ProductsStack.Screen
+        name="Products"
+        component={ProductsScreen}
         options={headBarStyle}
       />
-    </OperationStack.Navigator>
+    </ProductsStack.Navigator>
   );
 }
 
-// Setting
-const SettingStack = createStackNavigator();
+// Orders
+const OrdersStack = createStackNavigator();
+function TabOrdersNavigator() {
+  return (
+    <OrdersStack.Navigator>
+      <OrdersStack.Screen
+        name="Orders"
+        component={OrdersScreen}
+        options={headBarStyle}
+      />
+    </OrdersStack.Navigator>
+  );
+}
+
+// Profile
+const ProfileStack = createStackNavigator();
 function TabInventoryNavigator() {
   
   return (
-    <SettingStack.Navigator>
-      <SettingStack.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{
-          headerStyle: { backgroundColor: Code.primary },
-          headerTitleStyle: { color: Code.white },
-          headerTintColor: Code.white,
-          headerTitle: 'Setting',
-        }}
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={headBarStyle}
       />
-    </SettingStack.Navigator>
+    </ProfileStack.Navigator>
   );
 }
 
@@ -109,7 +121,7 @@ function TabNavigation() {
      
       <BottomTab.Screen
         name="Products"
-        component={TabOperationNavigator}
+        component={TabProductsNavigator}
         options={{
           headerShown: false,
           unmountOnBlur: true,
@@ -121,7 +133,7 @@ function TabNavigation() {
 
       <BottomTab.Screen
         name="Orders"
-        component={TabOperationNavigator}
+        component={TabOrdersNavigator}
         options={{
           headerShown: false,
           unmountOnBlur: true,
