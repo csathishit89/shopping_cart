@@ -3,94 +3,93 @@ import {
   SafeAreaView,
   View,
   Text,
+  TextInput,
   Image,
   FlatList,
   TouchableOpacity,
-  ScrollView,
-  StatusBar,
   Alert,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './products.styles';
+import { useSelector, useDispatch } from 'react-redux';
+import { 
+  selectCategoryResponse, 
+  selectCategoryResponseData, 
+} from '../../redux/category/category.selectors';
+
+import { 
+  getProductDataRespReset, 
+  getProductDataStart
+} from '../../redux/product/product.action';
+
+import { 
+  selectProductResponse, 
+  selectProductResponseData, 
+} from '../../redux/product/product.selectors';
 
 const STORAGE_KEY = '@cart_storage_key';
 
-const PRODUCTS = [
-  {
-    id: '1',
-    name: 'Full Cream Milk',
-    category: 'Milk',
-    price: 35,
-    unit: '500 ml',
-    image:
-      'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&auto=format&fit=crop&q=80',
-  },
-  {
-    id: '2',
-    name: 'Fresh Curd',
-    category: 'Curd',
-    price: 30,
-    unit: '500 g',
-    image:
-      'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500&auto=format&fit=crop&q=80',
-  },
-  {
-    id: '3',
-    name: 'Pure Ghee',
-    category: 'Ghee',
-    price: 180,
-    unit: '200 ml',
-    image:
-      'https://images.unsplash.com/photo-1638111539917-7c13d7c9c5b4?w=500&auto=format&fit=crop&q=80',
-  },
-  {
-    id: '4',
-    name: 'Fresh Butter',
-    category: 'Butter',
-    price: 58,
-    unit: '100 g',
-    image:
-      'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500&auto=format&fit=crop&q=80',
-  },
-  {
-    id: '5',
-    name: 'Paneer',
-    category: 'Paneer',
-    price: 95,
-    unit: '200 g',
-    image:
-      'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&auto=format&fit=crop&q=80',
-  },
-  {
-    id: '6',
-    name: 'Fresh Milk',
-    category: 'Milk',
-    price: 22,
-    unit: '250 ml',
-    image:
-      'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=80',
-  },
-];
-
-const CATEGORIES = [
-  'All',
-  'Dairy',
-  'Ice Cream',
-  'Biscuts',
-  'Snacks',
-  'Powder',
-  'Sweets',
-  'Cake',
-  'Beverages',
-];
-
 export default function ProductsScreen({ navigation }) {
+  const dispatch = useDispatch();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [cart, setCart] = useState({});
   const [isCartView, setIsCartView] = useState(false);
+  const categoryResp = useSelector(selectCategoryResponse);
+  const categoryResponseData = useSelector(selectCategoryResponseData) || [];
+  const productResp = useSelector(selectProductResponse);
+  const productResponseData = useSelector(selectProductResponseData) || [];
+  const SELECTED_ID_KEY = '@selected_category_id';
+  
+  useEffect(() => {
+    const fetchStoredId = async () => {
+      try {
+        const value = await AsyncStorage.getItem(SELECTED_ID_KEY);
+        if (value !== null) {
+          const getProductData = {
+            shopID: 1,
+            databaseName: 'General',
+            categoryID: value
+          };
+          dispatch(getProductDataStart(getProductData));
+          await AsyncStorage.removeItem(SELECTED_ID_KEY);
+        }
+      } catch (error) {
+        console.error('Failed to load ID from storage', error);
+      }
+    };
 
+    fetchStoredId(); 
+  }, []);
+
+  useEffect(() => {
+    const loadStoredCategory = async () => {
+      try {
+        const storedId = await AsyncStorage.getItem(SELECTED_ID_KEY);
+        if (storedId !== null && categoryResponseData.length > 0) {
+          const matchedCategory = categoryResponseData.find(
+            (cat) => String(cat.CategoryID) === String(storedId)
+          );
+
+          if (matchedCategory) {
+            setSelectedCategory(matchedCategory.CategoryName);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load stored category from storage', error);
+      }
+    };
+
+    loadStoredCategory();
+  }, [categoryResponseData]);
+  
+  useEffect(() => {
+    if (productResp !== null) {
+      dispatch(getProductDataRespReset());
+    }
+  }, [productResp]);
+  
   // Load saved cart from AsyncStorage on mount
   useEffect(() => {
     const loadCart = async () => {
@@ -118,29 +117,45 @@ export default function ProductsScreen({ navigation }) {
     saveCart();
   }, [cart]);
 
+  // Combined filtering for Category & Search
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => {
+    if (!Array.isArray(productResponseData)) return [];
+    return productResponseData.filter((product) => {
+      const categoryName = product.CategoryName || product.category || '';
+      const productName = product.ProductName || product.name || '';
+
       const matchesCategory =
-        selectedCategory === 'All' || product.category === selectedCategory;
-      const matchesSearch = product.name
+        selectedCategory === 'All' || categoryName.trim().toLowerCase() === selectedCategory.trim().toLowerCase();
+      
+      const matchesSearch = productName
         .toLowerCase()
         .includes(search.trim().toLowerCase());
+
       return matchesCategory && matchesSearch;
     });
-  }, [search, selectedCategory]);
+  }, [productResponseData, search, selectedCategory]);
 
   const cartCount = Object.values(cart).reduce(
     (total, quantity) => total + quantity,
     0
   );
 
-  const cartTotal = PRODUCTS.reduce((total, product) => {
-    return total + product.price * (cart[product.id] || 0);
-  }, 0);
+  const cartTotal = useMemo(() => {
+    if (!Array.isArray(productResponseData)) return 0;
+    return productResponseData.reduce((total, product) => {
+      const pId = product.ProductID || product.id;
+      const pPrice = product.ProductPrice || product.price || 0;
+      return total + pPrice * (cart[pId] || 0);
+    }, 0);
+  }, [productResponseData, cart]);
 
   const cartItemsList = useMemo(() => {
-    return PRODUCTS.filter((product) => (cart[product.id] || 0) > 0);
-  }, [cart]);
+    if (!Array.isArray(productResponseData)) return [];
+    return productResponseData.filter((product) => {
+      const pId = product.ProductID || product.id;
+      return (cart[pId] || 0) > 0;
+    });
+  }, [productResponseData, cart]);
 
   const increaseQuantity = (productId) => {
     setCart((previous) => ({
@@ -185,7 +200,6 @@ export default function ProductsScreen({ navigation }) {
   if (isCartView) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: '#F8F9FA' }]}>
-      
         {/* Cart Header */}
         <View style={{ 
           flexDirection: 'row', 
@@ -211,12 +225,19 @@ export default function ProductsScreen({ navigation }) {
         {/* Cart Items List */}
         <FlatList
           data={cartItemsList}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => String(item.ProductID || item.id)}
           contentContainerStyle={{ paddingVertical: 8, paddingBottom: 90 }}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => {
-            const qty = cart[item.id] || 0;
-            const itemTotalPrice = item.price * qty;
+            const pId = item.ProductID || item.id;
+            const pName = item.ProductName || item.name;
+            const pCategory = item.CategoryName || item.category;
+            const pPrice = item.ProductPrice || item.price || 0;
+            const pImage = item.ProductImage || item.image;
+            const pUnit = item.ProductQuantityText || item.unit || '';
+
+            const qty = cart[pId] || 0;
+            const itemTotalPrice = pPrice * qty;
 
             return (
               <View 
@@ -248,7 +269,7 @@ export default function ProductsScreen({ navigation }) {
                   }}
                 >
                   <Image
-                    source={{ uri: item.image }}
+                    source={{ uri: pImage && pImage.trim() !== '' ? pImage : 'http://shop.hindustancreation.in/images/aavin-img.png' }}
                     style={{ width: 70, height: 70 }}
                     resizeMode="cover"
                   />
@@ -257,19 +278,19 @@ export default function ProductsScreen({ navigation }) {
                 {/* Product details */}
                 <View style={{ flex: 1, marginLeft: 12 }}>
                   <Text style={{ fontSize: 10, fontWeight: '600', color: '#868E96', textTransform: 'uppercase', marginBottom: 2 }}>
-                    {item.category}
+                    {pCategory}
                   </Text>
                   <Text style={{ fontSize: 15, fontWeight: '700', color: '#212529', marginBottom: 2 }} numberOfLines={1}>
-                    {item.name}
+                    {pName}
                   </Text>
                   
                   {/* Unit & 1 Unit Price Display */}
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                     <Text style={{ fontSize: 12, color: '#868E96', marginRight: 8 }}>
-                      {item.unit}
+                      {pUnit}
                     </Text>
                     <Text style={{ fontSize: 12, color: '#495057', fontWeight: '600' }}>
-                      (₹{item.price} / {item.unit})
+                      (₹{pPrice} / {pUnit})
                     </Text>
                   </View>
 
@@ -292,7 +313,7 @@ export default function ProductsScreen({ navigation }) {
                     }}>
                       <TouchableOpacity
                         style={{ paddingHorizontal: 10, paddingVertical: 2 }}
-                        onPress={() => decreaseQuantity(item.id)}
+                        onPress={() => decreaseQuantity(pId)}
                       >
                         <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#2E7D32' }}>−</Text>
                       </TouchableOpacity>
@@ -303,7 +324,7 @@ export default function ProductsScreen({ navigation }) {
 
                       <TouchableOpacity
                         style={{ paddingHorizontal: 10, paddingVertical: 2 }}
-                        onPress={() => increaseQuantity(item.id)}
+                        onPress={() => increaseQuantity(pId)}
                       >
                         <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#2E7D32' }}>+</Text>
                       </TouchableOpacity>
@@ -334,23 +355,52 @@ export default function ProductsScreen({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: '#F8F9FA' }]}>
+    <SafeAreaView style={[styles.container]}>
       
+      {/* Search Bar Input Option */}
+      <View style={{ paddingHorizontal: 16, marginTop: 12, marginBottom: 8 }}>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: '#F1F3F5',
+          borderRadius: 10,
+          paddingHorizontal: 12,
+          paddingVertical: 8
+        }}>
+          <FontAwesome name="search" size={16} color="#868E96" style={{ marginRight: 8 }} />
+          <TextInput
+            style={{ flex: 1, fontSize: 14, color: '#212529', padding: 0 }}
+            placeholder="Search products..."
+            placeholderTextColor="#868E96"
+            value={search}
+            onChangeText={setSearch}
+          />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch('')}>
+              <FontAwesome name="times-circle" size={16} color="#868E96" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
       {/* Categories */}
-      <View style={[styles.categorySection, { paddingVertical: 10, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#F0F0F0' }]}>
-        <Text style={[styles.sectionTitleHead, { paddingHorizontal: 16, marginBottom: 8, fontSize: 16, fontWeight: '700', color: '#1A1A1A' }]}>
+      {/* <View style={[styles.categorySection]}>
+        <Text style={[styles.sectionTitleHead]}>
           Categories
         </Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[styles.categoryList, { paddingHorizontal: 16 }]}
+          contentContainerStyle={[styles.categoryList]}
         >
-          {CATEGORIES.map((category) => {
-            const isSelected = selectedCategory === category;
+          {[
+            { CategoryID: 0, CategoryName: 'All' },
+            ...categoryResponseData,
+          ].map((category) => {
+            const isSelected = selectedCategory === category.CategoryName;
             return (
               <TouchableOpacity
-                key={category}
+                key={category.CategoryID || category.CategoryName}
                 style={[
                   styles.categoryButton,
                   {
@@ -362,29 +412,36 @@ export default function ProductsScreen({ navigation }) {
                   },
                   isSelected && styles.selectedCategoryButton,
                 ]}
-                onPress={() => setSelectedCategory(category)}
+                onPress={() => setSelectedCategory(category.CategoryName)}
                 activeOpacity={0.8}
               >
                 <Text
                   style={[
                     styles.categoryText,
-                    { fontSize: 13, fontWeight: '600', color: isSelected ? '#FFFFFF' : '#495057' },
+                    { color: isSelected ? '#FFFFFF' : '#495057' },
                     isSelected && styles.selectedCategoryText,
                   ]}
                 >
-                  {category}
+                  {category.CategoryName}
                 </Text>
               </TouchableOpacity>
             );
           })}
         </ScrollView>
-      </View>
+      </View> */}
 
       {/* Products list */}
       <FlatList
         data={filteredProducts}
         renderItem={({ item }) => {
-          const quantity = cart[item.id] || 0;
+          const pId = item.ProductID || item.id;
+          const pName = item.ProductName || item.name;
+          const pCategory = item.CategoryName || item.category;
+          const pPrice = item.ProductPrice || item.price || 0;
+          const pImage = item.ProductImage || item.image;
+          const pUnit = item.ProductQuantityText || item.unit || '';
+
+          const quantity = cart[pId] || 0;
 
           return (
             <View 
@@ -416,7 +473,7 @@ export default function ProductsScreen({ navigation }) {
                 }}
               >
                 <Image
-                  source={{ uri: item.image }}
+                  source={{ uri: pImage && pImage.trim() !== '' ? pImage : 'http://shop.hindustancreation.in/images/aavin-img.png' }}
                   style={{ width: 70, height: 70 }}
                   resizeMode="cover"
                 />
@@ -425,19 +482,19 @@ export default function ProductsScreen({ navigation }) {
               {/* Product details wrapper */}
               <View style={{ flex: 1, marginLeft: 12, justifyContent: 'center' }}>
                 <Text style={{ fontSize: 10, fontWeight: '600', color: '#868E96', textTransform: 'uppercase', marginBottom: 2 }}>
-                  {item.category}
+                  {pCategory}
                 </Text>
                 <Text style={{ fontSize: 15, fontWeight: '700', color: '#212529', marginBottom: 2 }} numberOfLines={1}>
-                  {item.name}
+                  {pName}
                 </Text>
                 <Text style={{ fontSize: 12, color: '#868E96', marginBottom: 8 }}>
-                  {item.unit}
+                  {pUnit}
                 </Text>
 
                 {/* Bottom Row inside card: Price & Actions aligned cleanly */}
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Text style={{ fontSize: 16, fontWeight: '800', color: '#2E7D32' }}>
-                    ₹{item.price}
+                    ₹{pPrice}
                   </Text>
 
                   {/* Inline Action Row: + Add Button OR Compact Quantity Counter */}
@@ -451,7 +508,7 @@ export default function ProductsScreen({ navigation }) {
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
-                      onPress={() => increaseQuantity(item.id)}
+                      onPress={() => increaseQuantity(pId)}
                       activeOpacity={0.8}
                     >
                       <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 13 }}>+ Add</Text>
@@ -469,7 +526,7 @@ export default function ProductsScreen({ navigation }) {
                     }}>
                       <TouchableOpacity
                         style={{ paddingHorizontal: 10, paddingVertical: 2 }}
-                        onPress={() => decreaseQuantity(item.id)}
+                        onPress={() => decreaseQuantity(pId)}
                       >
                         <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#1C7ED6' }}>−</Text>
                       </TouchableOpacity>
@@ -480,7 +537,7 @@ export default function ProductsScreen({ navigation }) {
 
                       <TouchableOpacity
                         style={{ paddingHorizontal: 10, paddingVertical: 2 }}
-                        onPress={() => increaseQuantity(item.id)}
+                        onPress={() => increaseQuantity(pId)}
                       >
                         <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#1C7ED6' }}>+</Text>
                       </TouchableOpacity>
@@ -491,7 +548,7 @@ export default function ProductsScreen({ navigation }) {
             </View>
           );
         }}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => String(item.ProductID || item.id)}
         contentContainerStyle={{ paddingVertical: 8, paddingBottom: 90 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"

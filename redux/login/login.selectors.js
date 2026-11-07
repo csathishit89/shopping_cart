@@ -8,32 +8,32 @@ import ta from '../../constants/language/ta.json';
 import hi from '../../constants/language/hi.json';
 import ka from '../../constants/language/ka.json';
 
-const selectLoginUser = (state) => state.SNlogin;
+const selectLoginUser = (state) => state.login;
 
 export const selectUserLogin = createSelector(
   [selectLoginUser],
-  (SNlogin) => SNlogin.loginResponseChanged,
+  (login) => login.loginResponseChanged,
 );
 
 export const selectDecodeLoginRespone = createSelector(
   [selectLoginUser],
-  (SNlogin) => SNlogin.decodeLoginResponse,
+  (login) => login.decodeLoginResponse,
 );
 
 export const loggedInDetails = createSelector(
   [selectLoginUser],
-  (SNlogin) => SNlogin.loginWhiteListStorage,
+  (login) => login.loginWhiteListStorage,
 );
 
 export const selectUserDetails = createSelector(
   [selectLoginUser],
-  (SNlogin) => SNlogin.userDetails,
+  (login) => login.userDetails,
 );
 
 export const getLoginDetails = createSelector(
   [selectLoginUser],
-  (SNlogin) => {
-    const { loginWhiteListStorage } = SNlogin;
+  (login) => {
+    const { loginWhiteListStorage } = login;
     let userID = ''; let companyID = ''; let databaseName = ''; let generalCompanyID = ''; let infogID = ''; let level = ''; let officerAttendenceMandatory = ''; let BranchIDs = ''; let isHighMarkCheck = ''; let isCollectionPhotoNeeded = ''; let isHighmarkMandatoryForApp = ''; let isHavingConsumer = ''; let isQrPaymentAllow = 0; let isBorrowerHighmarkMandatory = 0; let isOTPNeeded = 0; let isAuditingImageNeed = 0; let isNextFollowUpNeed = 0; let isRejectionNeedForFieldOfficer= 0;
     if (loginWhiteListStorage !== null) {
       if (loginWhiteListStorage.length > 0) {

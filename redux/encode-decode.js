@@ -8,3 +8,4 @@ export const encodeJson = (encodeData, key) => JWT.encode(encodeData, key, { alg
 
 // JWT Token Decode
 export const decodeJson = (decodeData, key) => JWT.decode(decodeData, key, { algorithm: 'HS512' });
+

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,27 +10,48 @@ import {
   Dimensions,
 } from 'react-native';
 import styles from './dashboard.styles';
+import { useSelector, useDispatch } from 'react-redux';
+import { API_URL } from '../../redux/const';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { 
+  getCategoryDataRespReset, 
+  getCategoryDataStart
+} from '../../redux/category/category.action';
 
-const { width } = Dimensions.get('window');
-const CARD_MARGIN = 8;
-const CARD_WIDTH = (width - 32 - CARD_MARGIN * 2) / 2; // 2-column grid with padding
+import { 
+  selectCategoryResponse, 
+  selectCategoryResponseData, 
+} from '../../redux/category/category.selectors';
 
-const DASHBOARD_ITEMS = [
-  { id: '1', title: 'Dairy', image: require('../../assets/images/dairy_image.png') },
-  { id: '2', title: 'Ice Cream', image: require('../../assets/images/ice-cream.png') },
-  { id: '3', title: 'Biscuits', image: require('../../assets/images/milkBiscuts_aavin.png') },
-  { id: '4', title: 'Snacks', image: require('../../assets/images/snacks.png') },
-  { id: '5', title: 'Powder', image: require('../../assets/images/badamPowder.png') },
-  { id: '6', title: 'Sweets', image: require('../../assets/images/sweets.png') },
-  { id: '7', title: 'Cake', image: require('../../assets/images/cake.png') },
-  { id: '8', title: 'Beverages', image: require('../../assets/images/beverages.png') },
-];
 
-export default function DashboardScreen() {
-  const handleCardPress = (item) => {
-    // Handle navigation or action here
-    console.log('Pressed card:', item.title);
-  };
+export default function DashboardScreen({ navigation }) {
+  const dispatch = useDispatch();
+  const categoryResp = useSelector(selectCategoryResponse);
+  const categoryResponseData = useSelector(selectCategoryResponseData);
+
+  useEffect(() => {
+    const getDashData = {
+      shopID:1,
+      databaseName: 'General'
+    };
+    dispatch(getCategoryDataStart(getDashData));
+  }, []);
+
+  useEffect(() => {
+    if (categoryResp !== null) {
+      dispatch(getCategoryDataRespReset())
+    }
+  }, [categoryResp]);
+
+  const handleCardPress = async (item) => {
+    try {
+        const getCategoryID = String(item.CategoryID);
+        await AsyncStorage.setItem('@selected_category_id', getCategoryID);
+        navigation.navigate('Products');
+    } catch (error) {
+        console.error('Failed to save ID to storage', error);
+    }
+};
 
   const renderCard = ({ item }) => (
     <TouchableOpacity
@@ -39,13 +60,13 @@ export default function DashboardScreen() {
       onPress={() => handleCardPress(item)}
     >
       <Image
-        source={item.image}
+        source={{ uri: `${API_URL}${item.CategoryImage}` }}
         style={styles.cardImage}
         resizeMode="cover"
       />
       <View style={styles.titleContainer}>
         <Text style={styles.cardTitle} numberOfLines={2}>
-          {item.title}
+          {item.CategoryName}
         </Text>
       </View>
     </TouchableOpacity>
@@ -63,9 +84,9 @@ export default function DashboardScreen() {
       </View>
       
       <FlatList
-        data={DASHBOARD_ITEMS}
+        data={categoryResponseData}
         renderItem={renderCard}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.CategoryID}
         numColumns={2}
         contentContainerStyle={styles.listContent}
         columnWrapperStyle={styles.columnWrapper}

@@ -5,7 +5,7 @@ const { width } = Dimensions.get('window');
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F8F9FA'
   },
   sectionTitle: {
     fontSize: 18,
@@ -14,11 +14,12 @@ export default StyleSheet.create({
     marginBottom: 10,
   },
   sectionTitleHead: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 10,
-    marginLeft: 15
+    paddingHorizontal: 16,
+    marginBottom: 8, 
+    marginLeft: 2,
+    fontSize: 16, 
+    fontWeight: '700', 
+    color: '#1A1A1A'
   },
   sectionViewCartTitle: {
     fontSize: 20,
@@ -27,10 +28,10 @@ export default StyleSheet.create({
     textAlign: 'center'
   },
   categorySection: {
-    paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
+    paddingVertical: 10, 
+    backgroundColor: '#FFFFFF', 
+    borderBottomWidth: 1, 
+    borderBottomColor: '#F0F0F0'
   },
   categoryList: {
     paddingHorizontal: 16,
