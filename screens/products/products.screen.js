@@ -13,6 +13,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './products.styles';
 import { useSelector, useDispatch } from 'react-redux';
+import { API_URL } from '../../redux/const';
 import { 
   selectCategoryResponse, 
   selectCategoryResponseData, 
@@ -238,7 +239,6 @@ export default function ProductsScreen({ navigation }) {
 
             const qty = cart[pId] || 0;
             const itemTotalPrice = pPrice * qty;
-
             return (
               <View 
                 style={{
@@ -269,7 +269,7 @@ export default function ProductsScreen({ navigation }) {
                   }}
                 >
                   <Image
-                    source={{ uri: pImage && pImage.trim() !== '' ? pImage : 'http://shop.hindustancreation.in/images/aavin-img.png' }}
+                    source={{ uri: pImage && pImage !== '' ? `${API_URL}${pImage}` : 'http://shop.hindustancreation.in/images/aavin-img.png' }}
                     style={{ width: 70, height: 70 }}
                     resizeMode="cover"
                   />
@@ -473,9 +473,8 @@ export default function ProductsScreen({ navigation }) {
                 }}
               >
                 <Image
-                  source={{ uri: pImage && pImage.trim() !== '' ? pImage : 'http://shop.hindustancreation.in/images/aavin-img.png' }}
+                  source={{ uri: pImage && pImage !== '' ? `${API_URL}${pImage}` : 'http://shop.hindustancreation.in/images/aavin-img.png' }}
                   style={{ width: 70, height: 70 }}
-                  resizeMode="cover"
                 />
               </View>
 
