@@ -92,7 +92,7 @@ const LoginScreen = ({navigation}) => {
             <View style={subStyles.imageConatiner}>
               <Image
                 style={subStyles.logoImage}
-                source={require('../../assets/images/login/logo.png')}
+                source={require('../../assets/images/aavinHomeIcon.png')}
               />
             </View>
 

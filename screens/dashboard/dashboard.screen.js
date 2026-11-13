@@ -71,7 +71,7 @@ export default function DashboardScreen({ navigation }) {
       </View>
     </TouchableOpacity>
   );
-  const logo_image = require('../../assets/images/login/logo.png')
+  const logo_image = require('../../assets/images/aavinHomeIcon.png')
   return (
     <SafeAreaView style={styles.container}>
       

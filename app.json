@@ -1,30 +1,39 @@
 {
   "expo": {
-    "name": "aavinShop",
+    "name": "Aavin Shop",
     "slug": "aavinShop",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/images/appIcon.png",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/images/splash_screen.png",
+      "resizeMode": "cover"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/appIcon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
+      "package": "com.csathishit89.aavinShop",
       "usesCleartextTraffic": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "22df70e7-b6e7-4c07-815b-6a4a4f406fde"
+      }
+    },
+    "plugins": [
+      "@react-native-community/datetimepicker",
+      "expo-font",
+      "expo-build-properties"        
+    ]
   }
 }
