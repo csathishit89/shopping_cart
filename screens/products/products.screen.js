@@ -7,6 +7,7 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  ScrollView,
   Alert,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -35,6 +36,7 @@ export default function ProductsScreen({ navigation }) {
   const dispatch = useDispatch();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [sortBy, setSortBy] = useState('default'); // 'default', 'lowToHigh', 'highToLow', 'nameAZ'
   const [cart, setCart] = useState({});
   const [isCartView, setIsCartView] = useState(false);
   const categoryResp = useSelector(selectCategoryResponse);
@@ -118,10 +120,12 @@ export default function ProductsScreen({ navigation }) {
     saveCart();
   }, [cart]);
 
-  // Combined filtering for Category & Search
+  // Combined filtering (Category & Search) & Sorting
   const filteredProducts = useMemo(() => {
     if (!Array.isArray(productResponseData)) return [];
-    return productResponseData.filter((product) => {
+    
+    // 1. Filter logic
+    let result = productResponseData.filter((product) => {
       const categoryName = product.CategoryName || product.category || '';
       const productName = product.ProductName || product.name || '';
 
@@ -134,7 +138,28 @@ export default function ProductsScreen({ navigation }) {
 
       return matchesCategory && matchesSearch;
     });
-  }, [productResponseData, search, selectedCategory]);
+
+    // 2. Sort logic
+    result.sort((a, b) => {
+      const priceA = a.ProductPrice || a.price || 0;
+      const priceB = b.ProductPrice || b.price || 0;
+      const nameA = (a.ProductName || a.name || '').toLowerCase();
+      const nameB = (b.ProductName || b.name || '').toLowerCase();
+
+      if (sortBy === 'lowToHigh') {
+        return priceA - priceB;
+      } else if (sortBy === 'highToLow') {
+        return priceB - priceA;
+      } else if (sortBy === 'nameAZ') {
+        return nameA.localeCompare(nameB);
+      } else if (sortBy === 'nameZA') {
+        return nameB.localeCompare(nameA);
+      }
+      return 0; // default order
+    });
+
+    return result;
+  }, [productResponseData, search, selectedCategory, sortBy]);
 
   const cartCount = Object.values(cart).reduce(
     (total, quantity) => total + quantity,
@@ -383,52 +408,41 @@ export default function ProductsScreen({ navigation }) {
         </View>
       </View>
 
-      {/* Categories */}
-      {/* <View style={[styles.categorySection]}>
-        <Text style={[styles.sectionTitleHead]}>
-          Categories
-        </Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[styles.categoryList]}
-        >
-          {[
-            { CategoryID: 0, CategoryName: 'All' },
-            ...categoryResponseData,
-          ].map((category) => {
-            const isSelected = selectedCategory === category.CategoryName;
-            return (
-              <TouchableOpacity
-                key={category.CategoryID || category.CategoryName}
-                style={[
-                  styles.categoryButton,
-                  {
-                    paddingHorizontal: 16,
-                    paddingVertical: 8,
-                    borderRadius: 20,
-                    marginRight: 8,
-                    backgroundColor: isSelected ? '#2E7D32' : '#F1F3F5',
-                  },
-                  isSelected && styles.selectedCategoryButton,
-                ]}
-                onPress={() => setSelectedCategory(category.CategoryName)}
-                activeOpacity={0.8}
-              >
-                <Text
-                  style={[
-                    styles.categoryText,
-                    { color: isSelected ? '#FFFFFF' : '#495057' },
-                    isSelected && styles.selectedCategoryText,
-                  ]}
+      {/* Sort Options Bar */}
+      <View style={{ paddingHorizontal: 16, marginBottom: 8 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingVertical: 4 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: '#495057', marginRight: 8 }}>
+              Sort By:
+            </Text>
+            {[
+              { key: 'default', label: 'Default' },
+              { key: 'lowToHigh', label: 'Price: Low to High' },
+              { key: 'highToLow', label: 'Price: High to Low' },
+              { key: 'nameAZ', label: 'Name: A-Z' },
+            ].map((item) => {
+              const isSelected = sortBy === item.key;
+              return (
+                <TouchableOpacity
+                  key={item.key}
+                  onPress={() => setSortBy(item.key)}
+                  style={{
+                    backgroundColor: isSelected ? '#1C7ED6' : '#F1F3F5',
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    borderRadius: 16,
+                    marginRight: 6,
+                  }}
                 >
-                  {category.CategoryName}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: isSelected ? '#FFFFFF' : '#495057' }}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </ScrollView>
-      </View> */}
+      </View>
 
       {/* Products list */}
       <FlatList
