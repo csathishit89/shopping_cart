@@ -10,7 +10,7 @@ import Code from '../constants/ColorCodes';
 // Dashboard
 import DashboardScreen from '../screens/dashboard/dashboard.screen';
 
-//Products
+// Products
 import ProductsScreen from '../screens/products/products.screen';
 
 // Orders
@@ -18,9 +18,12 @@ import OrdersScreen from '../screens/orders/orders.screen';
 
 // Profile
 import ProfileScreen from '../screens/profile/profile.screen';
+import EditProfileScreen from '../screens/editProfile/editProfile.screen'; // Update path if your file is named differently
 
 const headBarStyle = {
-  headerTitle: '', headerStyle: {  height: 40, backgroundColor: Code.primary }, headerLeft: () => null,
+  headerTitle: '', 
+  headerStyle: { height: 40, backgroundColor: Code.primary }, 
+  headerLeft: () => null,
 };
 
 const headingStyle = (heading) => ({
@@ -36,14 +39,12 @@ const BottomTab = createBottomTabNavigator();
 const DashStack = createStackNavigator();
 function DashboardTabNavigator() {
   return (
-    <DashStack.Navigator
-  >
+    <DashStack.Navigator>
       <DashStack.Screen
         name="DashPage"
         component={DashboardScreen}
         options={headBarStyle}
       />
-
     </DashStack.Navigator>
   );
 }
@@ -79,13 +80,17 @@ function TabOrdersNavigator() {
 // Profile
 const ProfileStack = createStackNavigator();
 function TabInventoryNavigator() {
-  
   return (
     <ProfileStack.Navigator>
       <ProfileStack.Screen
-        name="Profile"
+        name="ProfileMain"
         component={ProfileScreen}
         options={headBarStyle}
+      />
+      <ProfileStack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={headingStyle('Edit Profile')}
       />
     </ProfileStack.Navigator>
   );
@@ -96,7 +101,7 @@ function TabNavigation() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName='DashboardPage'
+      initialRouteName="Home"
       screenOptions={{
         tabBarActiveTintColor: Code.primary,
         tabBarInactiveTintColor: Code.nonActive,
@@ -106,18 +111,17 @@ function TabNavigation() {
         unmountOnBlur: true
       }}
     >
-    <BottomTab.Screen
-      name="Home"
-      component={DashboardTabNavigator}
-      options={{
-        headerShown: false,
-        unmountOnBlur: true,
-        tabBarIcon: ({ color }) => (
-          <MaterialIcons name="dashboard" color={color} size={26} />
-        ),
-      }}
-    />
-    
+      <BottomTab.Screen
+        name="Home"
+        component={DashboardTabNavigator}
+        options={{
+          headerShown: false,
+          unmountOnBlur: true,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="dashboard" color={color} size={26} />
+          ),
+        }}
+      />
      
       <BottomTab.Screen
         name="Products"

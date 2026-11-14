@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Code from '../../constants/ColorCodes';
+import Spinner from 'react-native-loading-spinner-overlay';
 import styles from './products.styles';
 import { useSelector, useDispatch } from 'react-redux';
 import { API_URL } from '../../redux/const';
@@ -36,9 +38,11 @@ export default function ProductsScreen({ navigation }) {
   const dispatch = useDispatch();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [sortBy, setSortBy] = useState('default'); // 'default', 'lowToHigh', 'highToLow', 'nameAZ'
-  const [cart, setCart] = useState({}); // Stores { [productId]: { quantity, productDetails } }
+  const [sortBy, setSortBy] = useState('default');
+  const [cart, setCart] = useState({}); 
   const [isCartView, setIsCartView] = useState(false);
+  const [isLoading, setLoginSpinner] = useState(false);
+  const [selectedProductMsg, setSelectedProductMsg] = useState('No products found');
   const categoryResp = useSelector(selectCategoryResponse);
   const categoryResponseData = useSelector(selectCategoryResponseData) || [];
   const productResp = useSelector(selectProductResponse);
@@ -48,7 +52,10 @@ export default function ProductsScreen({ navigation }) {
   useEffect(() => {
     const fetchStoredId = async () => {
       try {
+        dispatch(getProductDataRespReset());
         const value = await AsyncStorage.getItem(SELECTED_ID_KEY);
+        setLoginSpinner(true);
+        setSelectedProductMsg('Loading Products');
         if (value !== null) {
           const getProductData = {
             shopID: 1,
@@ -57,6 +64,13 @@ export default function ProductsScreen({ navigation }) {
           };
           dispatch(getProductDataStart(getProductData));
           await AsyncStorage.removeItem(SELECTED_ID_KEY);
+        } else {
+          const getProductData = {
+            shopID: 1,
+            databaseName: 'General',
+            categoryID: ''
+          };
+          dispatch(getProductDataStart(getProductData));
         }
       } catch (error) {
         console.error('Failed to load ID from storage', error);
@@ -64,7 +78,7 @@ export default function ProductsScreen({ navigation }) {
     };
 
     fetchStoredId(); 
-  }, []);
+  }, [getProductDataRespReset]);
 
   useEffect(() => {
     const loadStoredCategory = async () => {
@@ -89,6 +103,8 @@ export default function ProductsScreen({ navigation }) {
   
   useEffect(() => {
     if (productResp !== null) {
+      setLoginSpinner(false);
+      setSelectedProductMsg('');
       dispatch(getProductDataRespReset());
     }
   }, [productResp]);
@@ -564,10 +580,10 @@ export default function ProductsScreen({ navigation }) {
         ListEmptyComponent={
           <View style={[styles.emptyContainer, { marginTop: 60 }]}>
             <Text style={{ fontSize: 32, marginBottom: 8 }}>🔍</Text>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: '#495057' }}>No products found</Text>
-            <Text style={{ fontSize: 13, color: '#868E96', marginTop: 4 }}>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: '#495057' }}>{selectedProductMsg}</Text>
+            {selectedProductMsg == 'No products found' ? <Text style={{ fontSize: 13, color: '#868E96', marginTop: 4 }}>
               Try another product name or category.
-            </Text>
+            </Text> : ''}
           </View>
         }
       />
@@ -591,6 +607,14 @@ export default function ProductsScreen({ navigation }) {
           </TouchableOpacity>
         </View>
       )}
+
+      <Spinner
+        visible={isLoading}
+        textContent="Loading..."
+        textStyle={styles.loadingText}
+        color={Code.primary_medium}
+        animation="slide"
+      />
     </SafeAreaView>
   );
 }
