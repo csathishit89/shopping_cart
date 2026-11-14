@@ -31,20 +31,19 @@ const LoginScreen = ({navigation}) => {
     phoneNumber: '',
     loginPassword: '',
     passwordIcon: 'eye-off',
-    security: true,
-    isShowCompanyModel: false,
   });
 
   const { phoneNumber, loginPassword, passwordIcon, security, isShowCompanyModel } = loginCredentials;
 
-  // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
     if (loginResponse !== null) {
       if (loginResponse.statusCode === '01') {
+        console.log('login SUCCESS');
         if (decodedResp.length > 1) {
           setUserCredentils({...loginCredentials, isShowCompanyModel: true});
         } else {
           loginNav(decodedResp[0]);
+          console.log('Goto Home');
         }
       } else if (loginResponse.statusCode === '100') {
         alertModel('Invaild Phone Number/Password');
@@ -139,30 +138,7 @@ const LoginScreen = ({navigation}) => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-
-      
-      <Modal
-        visible={isShowCompanyModel}
-      >
-        <View style={subStyles.modalStyleContainer}>
-          <Text style={subStyles.pendingDueHeadText}>Select Company</Text>
-          <View style={subStyles.repaymentType}>
-            {  decodedResp !== null && decodedResp !== undefined && decodedResp.length > 0 && decodedResp.map((item) => (
-              <TouchableOpacity
-                onPress={() => loginNav(item)}
-                style={subStyles.optionBtnContainer}
-                key={item.GeneralCompanyID}
-              >
-                <Text
-                  style={styles.activeBtnText}
-                >
-                  {item.CompanyName}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </Modal>
+ 
 
       <Spinner
         visible={isLoading}

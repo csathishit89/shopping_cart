@@ -5,10 +5,9 @@ import { decodeApiResponse } from '../common.utils';
 const INITIAL_STATE = {
   loginResponseChanged: null,
   decodeLoginResponse: null,
-  loginWhiteListStorage: [],
-  langType: 'en',
   appVersionResponse: null,
   userDetailsResponse: null,
+  loginWhiteListStorage: [],
   generalDataResp: null,
   generalData: [],
 };
@@ -19,8 +18,7 @@ const loginReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         loginResponseChanged: action.payload,
-        decodeLoginResponse: decodeApiResponse(action.payload, 'AppLoginUserKey'),
-        langType: 'en',
+        decodeLoginResponse: decodeApiResponse(action.payload, 'UserLoginVerify')
       };
 
     case LoginActionType.LOGIN_USER_RESPONSE_FAILURE:
@@ -29,20 +27,14 @@ const loginReducer = (state = INITIAL_STATE, action) => {
     case LoginActionType.LOGIN_USER_RESPONSE_CHANGED:
       return { ...state, loginResponseChanged: null };
 
-    case LoginActionType.ADD_PERSIST_LOGIN_DATA_START:
-      return { ...state, loginWhiteListStorage: action.payload, decodeLoginResponse: null };
-
     case LoginActionType.LOGIN_USER_SINGOUT_CHANGED:
       return {
-        ...state, loginResponseChanged: null, loginWhiteListStorage: [], langType: 'en',
+        ...state, loginResponseChanged: null, loginWhiteListStorage: []
       };
 
-    case LoginActionType.SET_LANGUAGE_START:
-      return {
-        ...state,
-        langType: action.payload,
-      };
-
+    case LoginActionType.ADD_PERSIST_LOGIN_DATA_START:
+      return { ...state, loginWhiteListStorage: action.payload, decodeLoginResponse: null };
+    
     case LoginActionType.GET_APP_VERSION_SUCCESS:
       return { ...state, appVersionResponse: action.payload, };
 
@@ -51,15 +43,6 @@ const loginReducer = (state = INITIAL_STATE, action) => {
 
     case LoginActionType.GET_APP_VERSION_CHANGED:
       return { ...state, appVersionResponse: null,  };
-
-      case LoginActionType.GET_USER_DETAILS_SUCCESS:
-        return { ...state, decodeLoginResponse: decodeApiResponse(action.payload, 'AppLoginUserKey'), userDetails: 'SUCCESS'};
-  
-      case LoginActionType.GET_USER_DETAILS_FAILURE:
-        return { ...state, decodeLoginResponse: null, userDetails: 'FAILURE' };
-  
-      case LoginActionType.GET_USER_DETAILS_CHANGED:
-        return { ...state, userDetails: null,  };
 
     case LoginActionType.GET_APP_GENERAL_DATA_SUCCESS:
       return {
@@ -73,6 +56,15 @@ const loginReducer = (state = INITIAL_STATE, action) => {
 
     case LoginActionType.GET_APP_GENERAL_DATA_CHANGED:
       return { ...state, generalDataResp: null };
+
+    case LoginActionType.GET_USER_DETAILS_SUCCESS:
+      return { ...state, decodeLoginResponse: decodeApiResponse(action.payload, 'UserDetailsVerify'), userDetails: 'SUCCESS'};
+
+    case LoginActionType.GET_USER_DETAILS_FAILURE:
+      return { ...state, decodeLoginResponse: null, userDetails: 'FAILURE' };
+
+    case LoginActionType.GET_USER_DETAILS_CHANGED:
+      return { ...state, userDetails: null,  };
 
     default:
       return state;

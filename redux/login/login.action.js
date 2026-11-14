@@ -24,46 +24,18 @@ export const loginUserResponseChanged = () => ({
   type: LoginActionType.LOGIN_USER_RESPONSE_CHANGED,
 });
 
-export const addPersistDataStart = (loginData) => ({
-  type: LoginActionType.ADD_PERSIST_LOGIN_DATA_START,
-  payload: loginData,
-});
-
-// LOGOUT
-
 export const logoutStart = () => ({
   type: LoginActionType.LOGIN_USER_SINGOUT_START,
 });
+
 
 export const logoutResponseChanged = () => ({
   type: LoginActionType.LOGIN_USER_SINGOUT_CHANGED,
 });
 
-export const setSelectedLanguageStart = (data) => ({
-  type: LoginActionType.SET_LANGUAGE_START,
-  payload: data,
-});
-
-export const getAppVesrionStart = () => ({
-  type: LoginActionType.GET_APP_VERSION_START,
-});
-
-export const getAppVesrionSuccess = (data) => ({
-  type: LoginActionType.GET_APP_VERSION_SUCCESS,
-  payload: data,
-});
-
-export const getAppVesrionFailure = (error) => ({
-  type: LoginActionType.GET_APP_VERSION_FAILURE,
-  payload: error,
-});
-
-export const getAppVesrionResetStart = () => ({
-  type: LoginActionType.GET_APP_VERSION_RESET_START,
-});
-
-export const getAppVesrionResponseChanged = () => ({
-  type: LoginActionType.GET_APP_VERSION_CHANGED,
+export const addPersistDataStart = (loginData) => ({
+  type: LoginActionType.ADD_PERSIST_LOGIN_DATA_START,
+  payload: loginData,
 });
 
 export const getAppGeneralDataStart = (userCredentials) => ({
@@ -87,6 +59,28 @@ export const getAppGeneralDataResetStart = () => ({
 
 export const getAppGeneralDataResponseChanged = () => ({
   type: LoginActionType.GET_APP_GENERAL_DATA_CHANGED,
+});
+
+export const getAppVesrionStart = () => ({
+  type: LoginActionType.GET_APP_VERSION_START,
+});
+
+export const getAppVesrionSuccess = (data) => ({
+  type: LoginActionType.GET_APP_VERSION_SUCCESS,
+  payload: data,
+});
+
+export const getAppVesrionFailure = (error) => ({
+  type: LoginActionType.GET_APP_VERSION_FAILURE,
+  payload: error,
+});
+
+export const getAppVesrionResetStart = () => ({
+  type: LoginActionType.GET_APP_VERSION_RESET_START,
+});
+
+export const getAppVesrionResponseChanged = () => ({
+  type: LoginActionType.GET_APP_VERSION_CHANGED,
 });
 
 export const getUserDetailsStart = (userCredentials) => ({

@@ -3,9 +3,9 @@ import { API_URL } from '../const';
 
 export const userLoginVerify = (loginData) => {
   const data = {
-    LoginAppToken: loginData,
+    userLoginDataToken: loginData,
   };
-  const url = `${API_URL}AppUserLogin`;
+  const url = `${API_URL}userLoginVerify`;
   return axios.post(url, data, { headers: { 'Content-type': 'application/json' } });
 };
 

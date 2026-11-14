@@ -37,7 +37,7 @@ export default function ProductsScreen({ navigation }) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('default'); // 'default', 'lowToHigh', 'highToLow', 'nameAZ'
-  const [cart, setCart] = useState({});
+  const [cart, setCart] = useState({}); // Stores { [productId]: { quantity, productDetails } }
   const [isCartView, setIsCartView] = useState(false);
   const categoryResp = useSelector(selectCategoryResponse);
   const categoryResponseData = useSelector(selectCategoryResponseData) || [];
@@ -161,65 +161,61 @@ export default function ProductsScreen({ navigation }) {
     return result;
   }, [productResponseData, search, selectedCategory, sortBy]);
 
+  // Calculate total item count from cart items structure
   const cartCount = Object.values(cart).reduce(
-    (total, quantity) => total + quantity,
+    (total, item) => total + (item.quantity || 0),
     0
   );
 
+  // Calculate grand total from cart items structure
   const cartTotal = useMemo(() => {
-    if (!Array.isArray(productResponseData)) return 0;
-    return productResponseData.reduce((total, product) => {
-      const pId = product.ProductID || product.id;
-      const pPrice = product.ProductPrice || product.price || 0;
-      return total + pPrice * (cart[pId] || 0);
+    return Object.values(cart).reduce((total, item) => {
+      const pPrice = item.product?.ProductPrice || item.product?.price || 0;
+      return total + pPrice * (item.quantity || 0);
     }, 0);
-  }, [productResponseData, cart]);
+  }, [cart]);
 
   const cartItemsList = useMemo(() => {
-    if (!Array.isArray(productResponseData)) return [];
-    return productResponseData.filter((product) => {
-      const pId = product.ProductID || product.id;
-      return (cart[pId] || 0) > 0;
-    });
-  }, [productResponseData, cart]);
+    return Object.values(cart).map((item) => item.product).filter(Boolean);
+  }, [cart]);
 
-  const increaseQuantity = (productId) => {
-    setCart((previous) => ({
-      ...previous,
-      [productId]: (previous[productId] || 0) + 1,
-    }));
+  const increaseQuantity = (product) => {
+    const pId = product.ProductID || product.id;
+    setCart((previous) => {
+      const currentEntry = previous[pId] || { quantity: 0, product };
+      return {
+        ...previous,
+        [pId]: {
+          quantity: currentEntry.quantity + 1,
+          product: product, // Always keep the latest snapshot of product details
+        },
+      };
+    });
   };
 
   const decreaseQuantity = (productId) => {
     setCart((previous) => {
-      const currentQty = previous[productId] || 0;
-      if (currentQty <= 1) {
+      const currentEntry = previous[productId];
+      if (!currentEntry) return previous;
+
+      if (currentEntry.quantity <= 1) {
         const updated = { ...previous };
         delete updated[productId];
         return updated;
       }
       return {
         ...previous,
-        [productId]: currentQty - 1,
+        [productId]: {
+          ...currentEntry,
+          quantity: currentEntry.quantity - 1,
+        },
       };
     });
   };
 
   const placeOrder = async () => {
-    Alert.alert(
-      'Order Placed Successfully! 🎉',
-      `Total Paid: ₹${cartTotal.toFixed(2)}\nThank you for your order.`,
-      [
-        {
-          text: 'OK',
-          onPress: async () => {
-            setCart({});
-            await AsyncStorage.removeItem(STORAGE_KEY);
-            setIsCartView(false);
-          },
-        },
-      ]
-    );
+    const savedCart = await AsyncStorage.getItem(STORAGE_KEY);
+    console.log(savedCart);
   };
 
   // Cart Page View
@@ -262,7 +258,7 @@ export default function ProductsScreen({ navigation }) {
             const pImage = item.ProductImage || item.image;
             const pUnit = item.ProductQuantityText || item.unit || '';
 
-            const qty = cart[pId] || 0;
+            const qty = cart[pId]?.quantity || 0;
             const itemTotalPrice = pPrice * qty;
             return (
               <View 
@@ -349,7 +345,7 @@ export default function ProductsScreen({ navigation }) {
 
                       <TouchableOpacity
                         style={{ paddingHorizontal: 10, paddingVertical: 2 }}
-                        onPress={() => increaseQuantity(pId)}
+                        onPress={() => increaseQuantity(item)}
                       >
                         <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#2E7D32' }}>+</Text>
                       </TouchableOpacity>
@@ -455,7 +451,7 @@ export default function ProductsScreen({ navigation }) {
           const pImage = item.ProductImage || item.image;
           const pUnit = item.ProductQuantityText || item.unit || '';
 
-          const quantity = cart[pId] || 0;
+          const quantity = cart[pId]?.quantity || 0;
 
           return (
             <View 
@@ -521,7 +517,7 @@ export default function ProductsScreen({ navigation }) {
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
-                      onPress={() => increaseQuantity(pId)}
+                      onPress={() => increaseQuantity(item)}
                       activeOpacity={0.8}
                     >
                       <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 13 }}>+ Add</Text>
@@ -550,7 +546,7 @@ export default function ProductsScreen({ navigation }) {
 
                       <TouchableOpacity
                         style={{ paddingHorizontal: 10, paddingVertical: 2 }}
-                        onPress={() => increaseQuantity(pId)}
+                        onPress={() => increaseQuantity(item)}
                       >
                         <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#1C7ED6' }}>+</Text>
                       </TouchableOpacity>

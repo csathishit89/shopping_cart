@@ -22,7 +22,7 @@ import {
 
 export function* userSignIn({ payload }) {
   try {
-    const key = 'AppLoginUserKey';
+    const key = 'UserLoginVerify';
     const jsonData = {
       UserName: payload.phoneNumber,
       UserPassword: payload.loginPassword,
@@ -118,7 +118,7 @@ export function* onGetUserDetailsRespStart() {
   yield takeLatest(LoginActionType.GET_USER_DETAILS_RESET_START, userDetailsRespClear);
 }
 
-export function* getGenaralData({ payload }) {
+export function* getGenaralData() {
   try {
     const responseData = yield call(fetchGeneralDataAPI);
     if (responseData.data.statusCode === '100') {
