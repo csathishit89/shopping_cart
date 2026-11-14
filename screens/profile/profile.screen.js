@@ -10,6 +10,7 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
+import { logoutResponseChanged } from '../../redux/login/login.action';
 import { loggedInDetails } from '../../redux/login/login.selectors';
 import styles from './profile.styles';
 
@@ -41,7 +42,7 @@ export default function ProfileScreen({ navigation }) {
             try {
               await AsyncStorage.removeItem('@selected_category_id');
               await AsyncStorage.removeItem('@cart_storage_key');
-              
+              dispatch(logoutResponseChanged())
               if (navigation && navigation.replace) {
                 navigation.replace('Login');
               }

@@ -8,6 +8,7 @@ import {
   FlatList,
   TouchableOpacity,
   ScrollView,
+  Modal,
   Alert,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -17,6 +18,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import styles from './products.styles';
 import { useSelector, useDispatch } from 'react-redux';
 import { API_URL } from '../../redux/const';
+import { loggedInDetails } from '../../redux/login/login.selectors';
 import { 
   selectCategoryResponse, 
   selectCategoryResponseData, 
@@ -36,6 +38,12 @@ const STORAGE_KEY = '@cart_storage_key';
 
 export default function ProductsScreen({ navigation }) {
   const dispatch = useDispatch();
+  const loginData = useSelector(loggedInDetails);
+  const userRecord = (loginData && loginData.length > 0) ? loginData[0] : {};
+
+  // Check if the user is an Admin (adjust condition based on your actual userType field value, e.g., '1', 'Admin', etc.)
+  const isAdminUser = String(userRecord.UserType || userRecord.userType || '').toLowerCase() === 'admin' || String(userRecord.Role || '') === '1';
+
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('default');
@@ -43,7 +51,12 @@ export default function ProductsScreen({ navigation }) {
   const [isCartView, setIsCartView] = useState(false);
   const [isLoading, setLoginSpinner] = useState(false);
   const [selectedProductMsg, setSelectedProductMsg] = useState('No products found');
-  const categoryResp = useSelector(selectCategoryResponse);
+
+  // Admin Customer Input Modal States
+  const [isCustomerModalVisible, setIsCustomerModalVisible] = useState(false);
+  const [customerNameInput, setCustomerNameInput] = useState('');
+  const [customerPhoneInput, setCustomerPhoneInput] = useState('');
+
   const categoryResponseData = useSelector(selectCategoryResponseData) || [];
   const productResp = useSelector(selectProductResponse);
   const productResponseData = useSelector(selectProductResponseData) || [];
@@ -58,7 +71,7 @@ export default function ProductsScreen({ navigation }) {
         setSelectedProductMsg('Loading Products');
         if (value !== null) {
           const getProductData = {
-            shopID: 1,
+            shopID: userRecord.ShopID || 1,
             databaseName: 'General',
             categoryID: value
           };
@@ -66,7 +79,7 @@ export default function ProductsScreen({ navigation }) {
           await AsyncStorage.removeItem(SELECTED_ID_KEY);
         } else {
           const getProductData = {
-            shopID: 1,
+            shopID: userRecord.ShopID || 1,
             databaseName: 'General',
             categoryID: ''
           };
@@ -140,7 +153,6 @@ export default function ProductsScreen({ navigation }) {
   const filteredProducts = useMemo(() => {
     if (!Array.isArray(productResponseData)) return [];
     
-    // 1. Filter logic
     let result = productResponseData.filter((product) => {
       const categoryName = product.CategoryName || product.category || '';
       const productName = product.ProductName || product.name || '';
@@ -155,7 +167,6 @@ export default function ProductsScreen({ navigation }) {
       return matchesCategory && matchesSearch;
     });
 
-    // 2. Sort logic
     result.sort((a, b) => {
       const priceA = a.ProductPrice || a.price || 0;
       const priceB = b.ProductPrice || b.price || 0;
@@ -171,19 +182,17 @@ export default function ProductsScreen({ navigation }) {
       } else if (sortBy === 'nameZA') {
         return nameB.localeCompare(nameA);
       }
-      return 0; // default order
+      return 0;
     });
 
     return result;
   }, [productResponseData, search, selectedCategory, sortBy]);
 
-  // Calculate total item count from cart items structure
   const cartCount = Object.values(cart).reduce(
     (total, item) => total + (item.quantity || 0),
     0
   );
 
-  // Calculate grand total from cart items structure
   const cartTotal = useMemo(() => {
     return Object.values(cart).reduce((total, item) => {
       const pPrice = item.product?.ProductPrice || item.product?.price || 0;
@@ -203,7 +212,7 @@ export default function ProductsScreen({ navigation }) {
         ...previous,
         [pId]: {
           quantity: currentEntry.quantity + 1,
-          product: product, // Always keep the latest snapshot of product details
+          product: product,
         },
       };
     });
@@ -229,9 +238,72 @@ export default function ProductsScreen({ navigation }) {
     });
   };
 
-  const placeOrder = async () => {
-    const savedCart = await AsyncStorage.getItem(STORAGE_KEY);
-    console.log(savedCart);
+  // Handles actual placement execution after getting customer info
+  const executeOrderSubmission = async (customerName, customerPhone) => {
+    try {
+      const itemsPayload = Object.values(cart).map((item) => ({
+        ProductID: item.product.ProductID || item.product.id,
+        Quantity: item.quantity,
+        Amount: (item.product.ProductPrice || item.product.price || 0) * item.quantity,
+      }));
+
+      const orderPayload = {
+        ShopID: userRecord.ShopID || 1,
+        DatabaseName: 'General',
+        CustomerName: customerName,
+        CustomerPhoneNumber: customerPhone,
+        InvoiceTotalAmount: cartTotal,
+        CreatedBy: userRecord.UserID || userRecord.userID || 0,
+        Items: itemsPayload,
+      };
+
+      console.log('Submitting Order Payload:', orderPayload);
+      
+      // TODO: Dispatch your Redux action for order placement here, e.g.:
+      // dispatch(createOrderStart(orderPayload));
+
+      Alert.alert('Success', 'Order placed successfully!', [
+        { 
+          text: 'OK', 
+          onPress: async () => {
+            setCart({});
+            await AsyncStorage.removeItem(STORAGE_KEY);
+            setIsCartView(false);
+          } 
+        }
+      ]);
+    } catch (error) {
+      console.error('Order placement failed', error);
+      Alert.alert('Error', 'Failed to place order. Please try again.');
+    }
+  };
+
+  const handlePlaceOrderClick = () => {
+    if (Object.keys(cart).length === 0) {
+      Alert.alert('Cart Empty', 'Please add items to your cart before placing an order.');
+      return;
+    }
+
+    if (isAdminUser) {
+      // If userType is admin, prompt for customer name & phone number
+      setCustomerNameInput('');
+      setCustomerPhoneInput('');
+      setIsCustomerModalVisible(true);
+    } else {
+      // If regular customer login, directly fetch details from login response
+      const customerName = userRecord.UserName || 'Customer';
+      const customerPhone = userRecord.UserPhoneNumber || '';
+      executeOrderSubmission(customerName, customerPhone);
+    }
+  };
+
+  const handleAdminModalSubmit = () => {
+    if (!customerNameInput.trim() || !customerPhoneInput.trim()) {
+      Alert.alert('Validation Error', 'Please enter both Customer Name and Phone Number.');
+      return;
+    }
+    setIsCustomerModalVisible(false);
+    executeOrderSubmission(customerNameInput.trim(), customerPhoneInput.trim());
   };
 
   // Cart Page View
@@ -293,7 +365,6 @@ export default function ProductsScreen({ navigation }) {
                   elevation: 2,
                 }}
               >
-                {/* Product image thumbnail */}
                 <View 
                   style={{
                     width: 70,
@@ -312,7 +383,6 @@ export default function ProductsScreen({ navigation }) {
                   />
                 </View>
 
-                {/* Product details */}
                 <View style={{ flex: 1, marginLeft: 12 }}>
                   <Text style={{ fontSize: 10, fontWeight: '600', color: '#868E96', textTransform: 'uppercase', marginBottom: 2 }}>
                     {pCategory}
@@ -321,7 +391,6 @@ export default function ProductsScreen({ navigation }) {
                     {pName}
                   </Text>
                   
-                  {/* Unit & 1 Unit Price Display */}
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                     <Text style={{ fontSize: 12, color: '#868E96', marginRight: 8 }}>
                       {pUnit}
@@ -331,13 +400,11 @@ export default function ProductsScreen({ navigation }) {
                     </Text>
                   </View>
 
-                  {/* Bottom Row: Total Item Price & Compact Quantity Selector */}
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={{ fontSize: 16, fontWeight: '800', color: '#2E7D32' }}>
                       ₹{itemTotalPrice}
                     </Text>
 
-                    {/* Compact Quantity Selector Row */}
                     <View style={{ 
                       flexDirection: 'row', 
                       alignItems: 'center', 
@@ -382,11 +449,63 @@ export default function ProductsScreen({ navigation }) {
           <TouchableOpacity
             style={styles.viewCartButton}
             activeOpacity={0.8}
-            onPress={placeOrder}
+            onPress={handlePlaceOrderClick}
           >
             <Text style={styles.viewCartText}>Place Order →</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Admin Customer Input Modal */}
+        <Modal
+          visible={isCustomerModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setIsCustomerModalVisible(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+            <View style={{ width: '100%', backgroundColor: '#FFFFFF', borderRadius: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 }}>
+              <Text style={{ fontSize: 18, fontWeight: '700', color: '#212529', marginBottom: 16, textAlign: 'center' }}>
+                Customer Details
+              </Text>
+
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#495057', marginBottom: 6 }}>Customer Name</Text>
+              <TextInput
+                style={{ borderWidth: 1, borderColor: '#CED4DA', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, marginBottom: 14, color: '#212529' }}
+                placeholder="Enter customer name"
+                placeholderTextColor="#ADB5BD"
+                value={customerNameInput}
+                onChangeText={setCustomerNameInput}
+              />
+
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#495057', marginBottom: 6 }}>Phone Number</Text>
+              <TextInput
+                style={{ borderWidth: 1, borderColor: '#CED4DA', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, marginBottom: 20, color: '#212529' }}
+                placeholder="Enter phone number"
+                placeholderTextColor="#ADB5BD"
+                keyboardType="phone-pad"
+                value={customerPhoneInput}
+                onChangeText={setCustomerPhoneInput}
+              />
+
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <TouchableOpacity
+                  style={{ flex: 1, backgroundColor: '#F1F3F5', borderRadius: 8, paddingVertical: 12, alignItems: 'center', marginRight: 8 }}
+                  onPress={() => setIsCustomerModalVisible(false)}
+                >
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#495057' }}>Cancel</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{ flex: 1, backgroundColor: Code.primary || '#1C7ED6', borderRadius: 8, paddingVertical: 12, alignItems: 'center', marginLeft: 8 }}
+                  onPress={handleAdminModalSubmit}
+                >
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#FFFFFF' }}>Submit</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
       </SafeAreaView>
     );
   }
@@ -486,7 +605,6 @@ export default function ProductsScreen({ navigation }) {
                 elevation: 2,
               }}
             >
-              {/* Product image thumbnail */}
               <View 
                 style={{
                   width: 70,
@@ -504,7 +622,6 @@ export default function ProductsScreen({ navigation }) {
                 />
               </View>
 
-              {/* Product details wrapper */}
               <View style={{ flex: 1, marginLeft: 12, justifyContent: 'center' }}>
                 <Text style={{ fontSize: 10, fontWeight: '600', color: '#868E96', textTransform: 'uppercase', marginBottom: 2 }}>
                   {pCategory}
@@ -516,13 +633,11 @@ export default function ProductsScreen({ navigation }) {
                   {pUnit}
                 </Text>
 
-                {/* Bottom Row inside card: Price & Actions aligned cleanly */}
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Text style={{ fontSize: 16, fontWeight: '800', color: '#2E7D32' }}>
                     ₹{pPrice}
                   </Text>
 
-                  {/* Inline Action Row: + Add Button OR Compact Quantity Counter */}
                   {quantity === 0 ? (
                     <TouchableOpacity
                       style={{
