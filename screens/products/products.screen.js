@@ -30,6 +30,12 @@ import {
 } from '../../redux/product/product.action';
 
 import { 
+  createOrderStart, 
+  createOrderRespReset
+} from '../../redux/order/order.action';
+
+
+import { 
   selectProductResponse, 
   selectProductResponseData, 
 } from '../../redux/product/product.selectors';
@@ -245,6 +251,7 @@ export default function ProductsScreen({ navigation }) {
         ProductID: item.product.ProductID || item.product.id,
         Quantity: item.quantity,
         Amount: (item.product.ProductPrice || item.product.price || 0) * item.quantity,
+        ProfitPrice: item.product.ProfitPrice 
       }));
 
       const orderPayload = {
@@ -260,7 +267,7 @@ export default function ProductsScreen({ navigation }) {
       console.log('Submitting Order Payload:', orderPayload);
       
       // TODO: Dispatch your Redux action for order placement here, e.g.:
-      // dispatch(createOrderStart(orderPayload));
+      dispatch(createOrderStart(orderPayload));
 
       Alert.alert('Success', 'Order placed successfully!', [
         { 
@@ -269,6 +276,7 @@ export default function ProductsScreen({ navigation }) {
             setCart({});
             await AsyncStorage.removeItem(STORAGE_KEY);
             setIsCartView(false);
+            navigation.dispatch(StackActions.replace('Orders'));
           } 
         }
       ]);

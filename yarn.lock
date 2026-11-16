@@ -1264,6 +1264,24 @@
   dependencies:
     node-forge "^1.3.3"
 
+"@expo/config-plugins@^58.0.13":
+  version "58.0.13"
+  resolved "https://registry.yarnpkg.com/@expo/config-plugins/-/config-plugins-58.0.13.tgz#d5b389ad8136b537e6b3caae27b35ede5ca632b9"
+  integrity sha512-Vbkt0vpIJ9z+oCFr2simtfuiPxdpIovDgYnzenC9z7jX0rlo8nTLGQky+q+SJdovIbyymGAO45UR0YqwLgbvKw==
+  dependencies:
+    "@expo/config-types" "^58.0.3"
+    "@expo/json-file" "~11.2.1"
+    "@expo/plist" "^0.10.2"
+    "@expo/require-utils" "^58.0.6"
+    "@expo/sdk-runtime-versions" "^1.0.1"
+    chalk "^4.1.2"
+    debug "^4.3.5"
+    semver "^7.7.4"
+    slugify "^1.6.6"
+    tinyglobby "^0.2.15"
+    xcode "^4.0.0"
+    xml2js "0.6.0"
+
 "@expo/config-plugins@~9.0.17":
   version "9.0.17"
   resolved "https://registry.yarnpkg.com/@expo/config-plugins/-/config-plugins-9.0.17.tgz#c997072209129b9f9616efa3533314b889cfd788"
@@ -1288,6 +1306,11 @@
   version "52.0.5"
   resolved "https://registry.yarnpkg.com/@expo/config-types/-/config-types-52.0.5.tgz#e10a226990dd903a4e3db5992ffb3015adf13f38"
   integrity sha512-AMDeuDLHXXqd8W+0zSjIt7f37vUd/BP8p43k68NHpyAvQO+z8mbQZm3cNQVAMySeayK2XoPigAFB1JF2NFajaA==
+
+"@expo/config-types@^58.0.3":
+  version "58.0.3"
+  resolved "https://registry.yarnpkg.com/@expo/config-types/-/config-types-58.0.3.tgz#5459806014b87d28a817ae4ad4f7c001798c8bce"
+  integrity sha512-wyfrwkTT/hQHzwyqkXkngKxoOa8L6ovsTP4h/UukS1mTmssee5et6HOPoN5RtawdJPnm5JO28f//C/wXlpka8Q==
 
 "@expo/config@~10.0.11":
   version "10.0.11"
@@ -1359,7 +1382,7 @@
     temp-dir "~2.0.0"
     unique-string "~2.0.0"
 
-"@expo/json-file@^11.2.1":
+"@expo/json-file@^11.2.1", "@expo/json-file@~11.2.1":
   version "11.2.1"
   resolved "https://registry.yarnpkg.com/@expo/json-file/-/json-file-11.2.1.tgz#57176987ed1060b0aa504defa4cc1a5079341184"
   integrity sha512-UPhKoFCj8BcwgLB1rKQ1CuR/REITnZLiqxHEHOeH1tPsdXcHGtUDh0P5bLbr7oU0nKVdtJ5rzyKx8jniMQdESQ==
@@ -1427,6 +1450,14 @@
     ora "^3.4.0"
     resolve-workspace-root "^2.0.0"
 
+"@expo/plist@^0.10.2":
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/@expo/plist/-/plist-0.10.2.tgz#c96d5ed5b54aca61002b3cd263980a5e16e43685"
+  integrity sha512-kaCDdGLtezkt5s1w7iCaISNJ+RkNac/1yBYYE8XyXLSJu3czGHZKzJGQ8fFOrpEGm6GdlIHFpzVeiF01ZVyHyg==
+  dependencies:
+    "@xmldom/xmldom" "^0.8.8"
+    xmlbuilder "^15.1.1"
+
 "@expo/plist@^0.2.2":
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@expo/plist/-/plist-0.2.2.tgz#2563b71b4aa78dc9dbc34cc3d2e1011e994bc9cd"
@@ -1453,6 +1484,15 @@
     semver "^7.6.0"
     xml2js "0.6.0"
 
+"@expo/require-utils@^58.0.6":
+  version "58.0.6"
+  resolved "https://registry.yarnpkg.com/@expo/require-utils/-/require-utils-58.0.6.tgz#0baae831b3d4560ac82ff8a564700aafefae3489"
+  integrity sha512-k9Ce7indjY3+nRBNT6wKw7NghN7pP6WhFnYNjuDiAypwjtVgaZHpD9fo0/g3/emDUpM6ebl8Ekz/teyUGfD9og==
+  dependencies:
+    "@babel/code-frame" "^7.20.0"
+    "@babel/core" "^7.25.2"
+    "@babel/plugin-transform-modules-commonjs" "^7.24.8"
+
 "@expo/rudder-sdk-node@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@expo/rudder-sdk-node/-/rudder-sdk-node-1.1.1.tgz#6aa575f346833eb6290282118766d4919c808c6a"
@@ -1466,7 +1506,7 @@
     remove-trailing-slash "^0.1.0"
     uuid "^8.3.2"
 
-"@expo/sdk-runtime-versions@^1.0.0":
+"@expo/sdk-runtime-versions@^1.0.0", "@expo/sdk-runtime-versions@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@expo/sdk-runtime-versions/-/sdk-runtime-versions-1.0.1.tgz#292403988e491b444f2a8c7c0921600bcc2ae3da"
   integrity sha512-kvisefkhxu8Fm/4M8G6DEqUaigrXfrSOm2lFw7hsk/nq0zchcp6B4wSk8rlheHY8FRi5iHxKtoVMGY/3M6h04A==
@@ -2133,6 +2173,11 @@
   dependencies:
     "@urql/core" "^5.1.2"
     wonka "^6.3.2"
+
+"@xmldom/xmldom@^0.8.8":
+  version "0.8.15"
+  resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.15.tgz#71ebf80729e4e95221d519ac9b1e1eaea7784907"
+  integrity sha512-/5NV/vDALVFDXgLmfsy9TRCBlKwO2LNBFzpzvb9iIj+jR+eSc6DLYYvVOdivT/jm7MtU6TebYuRmzEOI7w40UA==
 
 "@xmldom/xmldom@^0.9.10":
   version "0.9.12"
@@ -4439,10 +4484,19 @@ expo-notifications@~0.29.14:
     expo-application "~6.0.2"
     expo-constants "~17.0.8"
 
-expo-print@~14.0.3:
-  version "14.0.3"
-  resolved "https://registry.yarnpkg.com/expo-print/-/expo-print-14.0.3.tgz#86bb712dc5d79655ba4fff600cb0ef98ae5b0499"
-  integrity sha512-VEGl7SX3q2Z3ZKwvxtOBAlXm9yDX8Jodewr+kouQcg2EaV0ciAH9rqLwRWZhAtEETpVdEG53ow7IAmwJU7jInA==
+expo-print@^58.0.9:
+  version "58.0.9"
+  resolved "https://registry.yarnpkg.com/expo-print/-/expo-print-58.0.9.tgz#d4faeff3094714c0fc0364c1ef6586cffbf27594"
+  integrity sha512-LkjyzbbpTd9oaxZOIx7pIiZtPRZgp1FOG1B1akTs0i+2HfT5UNyVFNKgsfQKa/7Xo+Ec9+Pr73SLwRbYEtBL9Q==
+
+expo-sharing@^58.0.23:
+  version "58.0.23"
+  resolved "https://registry.yarnpkg.com/expo-sharing/-/expo-sharing-58.0.23.tgz#1ed28e2ea5dbe4028747bd77fb5fa3be31a4d2d1"
+  integrity sha512-TRu/CM7s4caW0TcVurO49468jtHAraoRVa4et5lHWKd18/5tfFMOA3ZAxsEezBaI8ehcLXhWc9FPBSxtYY6GYQ==
+  dependencies:
+    "@expo/config-plugins" "^58.0.13"
+    "@expo/config-types" "^58.0.3"
+    "@expo/plist" "^0.10.2"
 
 expo-splash-screen@~0.29.24:
   version "0.29.24"
@@ -4591,6 +4645,11 @@ fbjs@^3.0.0:
     promise "^7.1.1"
     setimmediate "^1.0.5"
     ua-parser-js "^1.0.35"
+
+fdir@^6.5.0:
+  version "6.5.0"
+  resolved "https://registry.yarnpkg.com/fdir/-/fdir-6.5.0.tgz#ed2ab967a331ade62f18d077dae192684d50d350"
+  integrity sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==
 
 fetch-retry@^4.1.1:
   version "4.1.1"
@@ -7107,6 +7166,11 @@ picomatch@^3.0.1:
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-3.0.2.tgz#8f543c114ddc037eab6b10fbd5a66cc8a51a02bc"
   integrity sha512-cfDHL6LStTEKlNilboNtobT/kEa30PtAf2Q1OgszfrG/rpVl1xaFWT9ktfkS306GmHgmnad1Sw4wabhlvFtsTw==
 
+picomatch@^4.0.4:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-4.0.7.tgz#6313360034ccb36b3dc61ecbdff78121f90fe21f"
+  integrity sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==
+
 pify@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/pify/-/pify-4.0.1.tgz#4b2cd25c50d598735c50292224fd8c6df41e3231"
@@ -7906,7 +7970,7 @@ semver@^6.3.0, semver@^6.3.1:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.2.tgz#f50413fbe5a686c6379385b2e8789b61c124a3c7"
   integrity sha512-GYrCADwpu6yV5OAvchkQ27Z5wwMxWAEMg5NNWjyHh/5DboFFqbdbvYNIvZouQpxXyeMPoTOh0vdPYKlf0ZswdQ==
 
-semver@^7.1.3, semver@^7.2.1, semver@^7.3.5, semver@^7.5.4, semver@^7.6.0:
+semver@^7.1.3, semver@^7.2.1, semver@^7.3.5, semver@^7.5.4, semver@^7.6.0, semver@^7.7.4:
   version "7.8.6"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.8.6.tgz#67c0cda133a3ceb6f70b803e67625bf969000424"
   integrity sha512-9lpSSU4Mly3mrtruwLs1eLK6+gzbzqeBFwRNjIjE+9LuDpWdYctrQlQ3ej1Ilgi7gknpsTRnPoLP8DpCHqHIJw==
@@ -8081,7 +8145,7 @@ signal-exit@^4.0.1:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-4.1.0.tgz#952188c1cbd546070e2dd20d0f41c0ae0530cb04"
   integrity sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==
 
-simple-plist@^1.1.0:
+simple-plist@^1.1.0, simple-plist@^1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/simple-plist/-/simple-plist-1.3.1.tgz#16e1d8f62c6c9b691b8383127663d834112fb017"
   integrity sha512-iMSw5i0XseMnrhtIzRb7XpQEXepa9xhWxGUojHBL43SIpQuDQkh3Wpy67ZbDzZVr6EKxvwVChnVpdl8hEVLDiw==
@@ -8581,6 +8645,14 @@ timers@0.1.x:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/timers/-/timers-0.1.1.tgz#86ac5c78c1ee419694f35a58de4fd4183cfb9c1e"
   integrity sha512-pkJC8uIP/gxDHxNQUBUbjHyl6oZfT+ofn7tbaHW+CFIUjI+Q2MBbHcx1JSBQfhDaTcO9bNg328q0i7Vk5PismQ==
+
+tinyglobby@^0.2.15:
+  version "0.2.17"
+  resolved "https://registry.yarnpkg.com/tinyglobby/-/tinyglobby-0.2.17.tgz#562a9a6c9eb2b3b123d39719f9af5bb44fcd7631"
+  integrity sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==
+  dependencies:
+    fdir "^6.5.0"
+    picomatch "^4.0.4"
 
 tmpl@1.0.5:
   version "1.0.5"
@@ -9124,6 +9196,13 @@ xcode@^3.0.1:
   dependencies:
     simple-plist "^1.1.0"
     uuid "^7.0.3"
+
+xcode@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/xcode/-/xcode-4.0.0.tgz#cbcd6125a712d32478b27ee730afc4db4122b902"
+  integrity sha512-dDaoWzc9EP2fp9FS9PVZUkyvFxY4y1TOV9pcKaKLk++Ei/qb97XDFEVP7GnW7Osii/TzVABJ0jq2F+9/lq0TVA==
+  dependencies:
+    simple-plist "^1.3.1"
 
 xml2js@0.6.0:
   version "0.6.0"
