@@ -3,11 +3,14 @@ import {
 } from 'redux-saga/effects';
 import ProductActionType from './product.types';
 import { encodeJson } from '../encode-decode';
-import { getProductList } from './product.services';
+import { getProductList, sendProductNewInfo } from './product.services';
 import { 
     getProductDataFailure, 
     getProductDataRespChanged, 
-    getProductDataSuccess
+    getProductDataSuccess,
+    saveProductNewInfoSuccess,
+    saveProductNewInfoFailure,
+    saveProductNewInfoRespChanged,
 } from './product.action';
 
 export function* productGetDetails({ payload }) {
@@ -43,9 +46,46 @@ export function* onResetProductGetStart() {
   yield takeLatest(ProductActionType.FETCH_PRODUCT_RESPONSE_RESET, productGetDetailsReset);
 }
 
+export function* saveProductNewInfoSaga({ payload }) {
+  try {
+    const key = 'SaveProductNewInfoKey';
+    const jsonData = {
+      ShopID: payload.ShopID,
+      DatabaseName: payload.DatabaseName,
+      ProductID: payload.ProductID,
+      NewMRP_Price: payload.NewMRP_Price,
+      Secratekey: key,
+    };
+    const tokenData = encodeJson(jsonData, key);
+    const responseData = yield call(sendProductNewInfo, tokenData);
+    
+    if (responseData.data.statusCode === '100' || responseData.data.statusCode === '102' || responseData.data.statusCode === '111') {
+      yield put(saveProductNewInfoFailure(responseData.data));
+    } else {
+      yield put(saveProductNewInfoSuccess(responseData.data));
+    }
+  } catch (error) {
+    yield put(saveProductNewInfoFailure(error));
+  }
+}
+
+export function* saveProductNewInfoResetSaga() {
+  yield put(saveProductNewInfoRespChanged());
+}
+
+export function* onSaveProductNewInfoStart() {
+  yield takeLatest(ProductActionType.SAVE_PRODUCT_NEW_INFO_START, saveProductNewInfoSaga);
+}
+
+export function* onResetSaveProductNewInfoStart() {
+  yield takeLatest(ProductActionType.SAVE_PRODUCT_NEW_INFO_RESPONSE_RESET, saveProductNewInfoResetSaga);
+}
+
 export function* productSaga() {
   yield all([
     call(onProductGetStart),
     call(onResetProductGetStart),
+    call(onSaveProductNewInfoStart),
+    call(onResetSaveProductNewInfoStart),
   ]);
 }

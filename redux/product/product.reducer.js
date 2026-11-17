@@ -4,6 +4,8 @@ import { decodeApiResponse } from '../common.utils';
 const INITIAL_STATE = {
   fetchProductResponse: null,
   fetchProductData: [],
+  saveProductNewInfoResponse: null,
+  saveProductNewInfoData: []
 };
 
 const productReducer = (state = INITIAL_STATE, action) => {
@@ -20,6 +22,19 @@ const productReducer = (state = INITIAL_STATE, action) => {
 
     case ProductActionType.FETCH_PRODUCT_RESPONSE_CHANGED:
       return { ...state, fetchProductResponse: null };
+    
+    case ProductActionType.SAVE_PRODUCT_NEW_INFO_SUCCESS:
+      return {
+        ...state,
+        saveProductNewInfoResponse: action.payload,
+        saveProductNewInfoData: decodeApiResponse(action.payload, 'SaveProductNewInfoKey'),
+      };
+
+    case ProductActionType.SAVE_PRODUCT_NEW_INFO_FAILURE:
+      return { ...state, saveProductNewInfoResponse: action.payload };
+
+    case ProductActionType.SAVE_PRODUCT_NEW_INFO_RESPONSE_CHANGED:
+      return { ...state, saveProductNewInfoResponse: null };
 
     default:
       return state;

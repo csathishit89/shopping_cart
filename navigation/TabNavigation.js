@@ -18,7 +18,8 @@ import OrdersScreen from '../screens/orders/orders.screen';
 
 // Profile
 import ProfileScreen from '../screens/profile/profile.screen';
-import EditProfileScreen from '../screens/editProfile/editProfile.screen'; // Update path if your file is named differently
+import EditProfileScreen from '../screens/editProfile/editProfile.screen'; 
+import UpdateProductsScreen from '../screens/updateProducts/updateProducts.screen';
 
 const headBarStyle = {
   headerTitle: '', 
@@ -91,6 +92,11 @@ function TabInventoryNavigator() {
         name="EditProfile"
         component={EditProfileScreen}
         options={headingStyle('Edit Profile')}
+      />
+      <ProfileStack.Screen
+        name="UpdateProducts"
+        component={UpdateProductsScreen}
+        options={headingStyle('Update Product')}
       />
     </ProfileStack.Navigator>
   );

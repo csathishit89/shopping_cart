@@ -264,9 +264,6 @@ export default function ProductsScreen({ navigation }) {
         Items: itemsPayload,
       };
 
-      console.log('Submitting Order Payload:', orderPayload);
-      
-      // TODO: Dispatch your Redux action for order placement here, e.g.:
       dispatch(createOrderStart(orderPayload));
 
       Alert.alert('Success', 'Order placed successfully!', [

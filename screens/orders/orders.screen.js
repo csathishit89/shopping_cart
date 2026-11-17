@@ -84,34 +84,6 @@ export default function OrdersScreen({ navigation }) {
     }
   };
 
-  // Mock order list data (replace with useSelector from your order reducer when integrated)
-  const [ordersList] = useState([
-    {
-      InvoiceID: 1045,
-      InvoiceDateTime: '2026-11-16 10:30:00',
-      InvoiceTotalAmount: 400,
-      CreatedBy: 'Srimathi C',
-      CustomerName: 'Rahul Kumar',
-      CustomerPhoneNumber: '9876543210',
-      Items: [
-        { ProductName: 'Aavin Milk', Quantity: 1, Amount: 320, Unit: '1 Ltr' },
-        { ProductName: 'Curd', Quantity: 1, Amount: 60, Unit: '500 ml' },
-        { ProductName: 'Butter', Quantity: 1, Amount: 20, Unit: '100 g' },
-      ],
-    },
-    {
-      InvoiceID: 1044,
-      InvoiceDateTime: '2026-11-15 14:15:00',
-      InvoiceTotalAmount: 180,
-      CreatedBy: 'Admin User',
-      CustomerName: 'Priya Sharma',
-      CustomerPhoneNumber: '8765432109',
-      Items: [
-        { ProductName: 'Ghee', Quantity: 2, Amount: 180, Unit: '200 ml' },
-      ],
-    },
-  ]);
-
   // Handle Download / Print PDF Invoice
   const handle_pdf_downloadInvoice = async (order) => {
     try {

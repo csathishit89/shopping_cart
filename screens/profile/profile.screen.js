@@ -56,6 +56,10 @@ export default function ProfileScreen({ navigation }) {
     );
   };
 
+  const handleProductPriceList = () => {
+      navigation.navigate('UpdateProducts');
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: '#F8F9FA' }]}>
       {/* Profile Header Title */}
@@ -175,6 +179,17 @@ export default function ProfileScreen({ navigation }) {
             <Text style={{ fontSize: 14, fontWeight: '600', color: '#495057', marginLeft: 8 }}>Address</Text>
             <Text style={{ fontSize: 14, color: '#212529', marginLeft: '16', fontWeight: '600', flex: 1, textAlign: 'right' }} numberOfLines={2}>
               {userProfile.address}
+            </Text>
+          </View>
+
+          {/* Update Product Price Row */}
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 12 }}>
+            <FontAwesome name="pencil" size={16} color="#1C7ED6" style={{ width: 24, marginTop: 2 }} />
+            <Text style={{ fontSize: 14, fontWeight: '600', color: '#495057', marginLeft: 8 }}>Update Product Price</Text>
+            <Text style={{ fontSize: 14, color: '#212529', marginLeft: '16', fontWeight: '600', flex: 1, textAlign: 'right' }} numberOfLines={2}>
+              <TouchableOpacity activeOpacity={0.8} onPress={handleProductPriceList}>
+                <FontAwesome name="arrow-right" size={20} color="#1C7ED6" style={{ width: 24, marginTop: 2 }} />
+              </TouchableOpacity>
             </Text>
           </View>
         </View>

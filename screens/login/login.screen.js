@@ -38,12 +38,10 @@ const LoginScreen = ({navigation}) => {
   useEffect(() => {
     if (loginResponse !== null) {
       if (loginResponse.statusCode === '01') {
-        console.log('login SUCCESS');
         if (decodedResp.length > 1) {
           setUserCredentils({...loginCredentials, isShowCompanyModel: true});
         } else {
           loginNav(decodedResp[0]);
-          console.log('Goto Home');
         }
       } else if (loginResponse.statusCode === '100') {
         alertModel('Invaild Phone Number/Password');

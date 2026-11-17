@@ -11,3 +11,13 @@ export const selectProductResponse = createSelector(
   [selectProductList],
   (product) => product.fetchProductResponse,
 );
+
+export const selectSaveProductNewInfoData = createSelector(
+  [selectProductList],
+  (product) => product.saveProductNewInfoData,
+);
+
+export const selectSaveProductNewInfoResponse = createSelector(
+  [selectProductList],
+  (product) => product.saveProductNewInfoResponse,
+);
