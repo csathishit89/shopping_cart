@@ -10,3 +10,11 @@ export const createOrderService = (orderData) => {
   console.log(url);
   return axios.post(url, data, { headers: { 'Content-type': 'application/json' } });
 };
+
+export const getOrderList = (orderData) => {
+  const data = {
+    GetOrderListToken: orderData,
+  };
+  const url = `${API_URL}GetOrderList`;
+  return axios.post(url, data, { headers: { 'Content-type': 'application/json' } });
+};

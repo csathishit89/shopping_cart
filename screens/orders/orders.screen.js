@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -16,17 +16,48 @@ import { useSelector, useDispatch } from 'react-redux';
 import { loggedInDetails } from '../../redux/login/login.selectors';
 import Code from '../../constants/ColorCodes';
 import styles from './orders.styles';
+import { API_URL } from '../../redux/const';
+import { 
+  getOrderDataRespReset, 
+  getOrderDataStart
+} from '../../redux/order/order.action';
+
+import { 
+  selectOrderResponse, 
+  selectOrderResponseData, 
+} from '../../redux/order/order.selectors';
 
 export default function OrdersScreen({ navigation }) {
   const dispatch = useDispatch();
   const loginData = useSelector(loggedInDetails);
   const userRecord = (loginData && loginData.length > 0) ? loginData[0] : {};
-
-  // Selected order for viewing invoice popup
+  const orderResp = useSelector(selectOrderResponse);
+  const orderResponseData = useSelector(selectOrderResponseData);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
 
-  // Helper to format YYYY-MM-DD HH:MM:SS to DD-MM-YYYY HH:MM AM/PM
+  useEffect(() => {
+    let getCustomerID=0;
+    if(userRecord.UserType=='Admin'){
+      getCustomerID=0;
+    } else {
+      getCustomerID=userRecord.UserID;
+    }
+
+    const getOrderData = {
+      shopID:1,
+      customerID: getCustomerID,
+      databaseName: 'General',
+    };
+    dispatch(getOrderDataStart(getOrderData));
+  }, []);
+
+  useEffect(() => {
+      if (orderResp !== null) {
+        dispatch(getOrderDataRespReset())
+      }
+    }, [orderResp]);
+  
   const formatDateTime = (dateString) => {
     if (!dateString) return '';
     try {
@@ -176,6 +207,7 @@ export default function OrdersScreen({ navigation }) {
     }
   };
 
+
   const handle_thermal_downloadInvoice = async (order) => {
     try {
       const htmlAtmSlip = `
@@ -192,6 +224,7 @@ export default function OrdersScreen({ navigation }) {
               }
               .center { text-align: center; }
               .bold { font-weight: bold; }
+              .logo { width: 60%; height: 6%; }
               .row { display: flex; justify-content: space-between; margin: 3px 0; }
               .divider { border-bottom: 1px dashed #000; margin: 8px 0; }
               table { width: 100%; border-collapse: collapse; margin-top: 5px; }
@@ -201,7 +234,9 @@ export default function OrdersScreen({ navigation }) {
             </style>
           </head>
           <body>
-            <div class="center bold" style="font-size: 14px;">AAVIN</div>
+            <div class="center">
+              <img src="${API_URL}/images/aavinHomeIcon.png" class="logo" />
+            </div>
             <div class="center">22 T.H.Road, M.R.Nagar</div>
             <div class="center">Kodungaiyur, Opp.Poorvika Mobiles</div>
             <div class="center">Chennai - 600118</div>
@@ -210,10 +245,19 @@ export default function OrdersScreen({ navigation }) {
             <div class="divider"></div>
 
             <div class="row">
-              <span>Inv: #${order.InvoiceID}</span>
-              <span>${order.InvoiceDateTime}</span>
+              <span style='font-size:10px'>Bill No: ${order.InvoiceID}</span>
+              <span style='font-size:10px'>Date: ${order.InvoiceDateTime}</span>
             </div>
-            <div>Customer: ${order.CustomerName || 'Walk-in'}</div>
+
+            <div class="row">
+              <span>Name: </span>
+              <span>${order.CustomerName || 'Walk-in'}</span>
+            </div>
+            
+            <div class="row">
+              <span>Mobile: </span>
+              <span>${order.CustomerPhoneNumber || '-'}</span>
+            </div>
 
             <div class="divider"></div>
 
@@ -239,8 +283,18 @@ export default function OrdersScreen({ navigation }) {
             <div class="divider"></div>
 
             <div class="row bold" style="font-size: 13px;">
-              <span>TOTAL:</span>
+              <span>Total:</span>
               <span>₹${order.InvoiceTotalAmount}.00</span>
+            </div>
+
+            <div class="row bold" style="font-size: 13px;">
+              <span>Cash Value:</span>
+              <span>₹200.00</span>
+            </div>
+
+            <div class="row bold" style="font-size: 13px;">
+              <span>Balance:</span>
+              <span>₹40.00</span>
             </div>
 
             <div class="divider"></div>
@@ -268,7 +322,7 @@ export default function OrdersScreen({ navigation }) {
 
   const renderOrderItem = ({ item }) => {
     const totalItems = Array.isArray(item.Items)
-      ? item.Items.reduce((sum, orderItem) => sum + (orderItem.Quantity || 0), 0)
+      ? item.Items.reduce((sum, orderItem) => sum + Number(orderItem.Quantity || 0), 0)
       : 0;
 
     return (
@@ -306,7 +360,7 @@ export default function OrdersScreen({ navigation }) {
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
           <FontAwesome name="user-circle-o" size={13} color="#495057" style={{ marginRight: 6 }} />
           <Text style={{ fontSize: 13, fontWeight: '600', color: '#495057' }}>
-            Created by: <Text style={{ color: '#1C7ED6', fontWeight: '700' }}>{item.CreatedBy || 'Unknown'}</Text>
+            Created by: <Text style={{ color: '#1C7ED6', fontWeight: '700' }}>{item.CreatedByName || '-'}</Text>
           </Text>
         </View>
 
@@ -338,7 +392,7 @@ export default function OrdersScreen({ navigation }) {
       </View>
 
       <FlatList
-        data={ordersList}
+        data={orderResponseData}
         renderItem={renderOrderItem}
         keyExtractor={(item) => String(item.InvoiceID)}
         contentContainerStyle={{ paddingVertical: 12 }}
@@ -383,7 +437,7 @@ export default function OrdersScreen({ navigation }) {
                       <Text style={{ fontWeight: '700' }}>Customer:</Text> {selectedOrder.CustomerName || 'Walk-in Customer'} ({selectedOrder.CustomerPhoneNumber || '-'})
                     </Text>
                     <Text style={{ fontSize: 13, color: '#495057' }}>
-                      <Text style={{ fontWeight: '700' }}>Created By:</Text> {selectedOrder.CreatedBy}
+                      <Text style={{ fontWeight: '700' }}>Created By:</Text> {selectedOrder.CreatedByName}
                     </Text>
                   </View>
 

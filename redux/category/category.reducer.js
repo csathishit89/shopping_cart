@@ -9,21 +9,21 @@ const INITIAL_STATE = {
 
 const categoryReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case CategoryActionType.FETCH_CATEGORY_SUCCESS:
-			return {
-				...state,
-				fetchCategoryResponse: action.payload,
-				fetchCategoryData: decodeApiResponse(action.payload, 'GetCategoryListKey'),
-			};
+	case CategoryActionType.FETCH_CATEGORY_SUCCESS:
+		return {
+			...state,
+			fetchCategoryResponse: action.payload,
+			fetchCategoryData: decodeApiResponse(action.payload, 'GetCategoryListKey'),
+		};
 
-		case CategoryActionType.FETCH_CATEGORY_FAILURE:
-			return { ...state, fetchCategoryResponse: action.payload };
+	case CategoryActionType.FETCH_CATEGORY_FAILURE:
+		return { ...state, fetchCategoryResponse: action.payload };
 
-		case CategoryActionType.FETCH_CATEGORY_RESPONSE_CHANGED:
-			return { ...state, fetchCategoryResponse: null };
+	case CategoryActionType.FETCH_CATEGORY_RESPONSE_CHANGED:
+		return { ...state, fetchCategoryResponse: null };
 
-    default:
-      return state;
+	default:
+		return state;
   }
 };
 

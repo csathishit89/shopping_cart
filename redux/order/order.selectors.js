@@ -11,3 +11,13 @@ export const selectCreateOrderResponse = createSelector(
   [selectOrderState],
   (order) => order.createOrderResponse,
 );
+
+export const selectOrderResponseData = createSelector(
+  [selectOrderState],
+  (order) => order.fetchOrderData,
+);
+
+export const selectOrderResponse = createSelector(
+  [selectOrderState],
+  (order) => order.fetchOrderResponse,
+);

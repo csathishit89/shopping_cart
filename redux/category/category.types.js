@@ -1,6 +1,6 @@
 const CategoryActionType = {
-  /** ****************************** LOGIN *********************** */
-  FETCH_CATEGORY_START: 'FETCH_CATEGORY_START',
+	/** ****************************** FETCH CATEGORY *********************** */
+	FETCH_CATEGORY_START: 'FETCH_CATEGORY_START',
 	FETCH_CATEGORY_SUCCESS: 'FETCH_CATEGORY_SUCCESS',
 	FETCH_CATEGORY_FAILURE: 'FETCH_CATEGORY_FAILURE',
 	FETCH_CATEGORY_RESPONSE_RESET: 'FETCH_CATEGORY_RESPONSE_RESET',
