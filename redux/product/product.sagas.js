@@ -3,7 +3,7 @@ import {
 } from 'redux-saga/effects';
 import ProductActionType from './product.types';
 import { encodeJson } from '../encode-decode';
-import { getProductList, sendProductNewInfo } from './product.services';
+import { getProductList, sendProductNewInfo, addProduct } from './product.services';
 import { 
     getProductDataFailure, 
     getProductDataRespChanged, 
@@ -11,6 +11,9 @@ import {
     saveProductNewInfoSuccess,
     saveProductNewInfoFailure,
     saveProductNewInfoRespChanged,
+    addProductFailure,
+    addProductSuccess,
+    addProductRespChanged    
 } from './product.action';
 
 export function* productGetDetails({ payload }) {
@@ -81,11 +84,56 @@ export function* onResetSaveProductNewInfoStart() {
   yield takeLatest(ProductActionType.SAVE_PRODUCT_NEW_INFO_RESPONSE_RESET, saveProductNewInfoResetSaga);
 }
 
+export function* addProductSaga({ payload }) {
+  try {
+    const key = 'AddProductKey';
+    const jsonData = {
+      ShopID: payload.shopID,
+      DatabaseName: payload.databaseName,
+      productName: payload.productName,
+      categoryID: payload.categoryID,
+      productImage: payload.productImage,
+      quantity: payload.quantity,
+      quantityType: payload.quantityType,
+      mrpPrice: payload.mrpPrice,
+      purchasePrice: payload.purchasePrice,
+      profitPrice: payload.profitPrice,
+      effectiveDateTime: payload.effectiveDateTime,
+      isActive: payload.isActive,
+    };
+    console.log(jsonData);
+    const tokenData = encodeJson(jsonData, key);
+    const responseData = yield call(addProduct, tokenData);
+    
+    if (responseData.data.statusCode === '100' || responseData.data.statusCode === '102' || responseData.data.statusCode === '111') {
+      yield put(addProductFailure(responseData.data));
+    } else {
+      yield put(addProductSuccess(responseData.data));
+    }
+  } catch (error) {
+    yield put(addProductFailure(error));
+  }
+}
+
+export function* addProductResetSaga() {
+  yield put(addProductRespChanged());
+}
+
+export function* onAddProductStart() {
+  yield takeLatest(ProductActionType.ADD_PRODUCT_START, addProductSaga);
+}
+
+export function* onResetAddProductStart() {
+  yield takeLatest(ProductActionType.ADD_PRODUCT_RESPONSE_RESET, addProductResetSaga);
+}
+
 export function* productSaga() {
   yield all([
     call(onProductGetStart),
     call(onResetProductGetStart),
     call(onSaveProductNewInfoStart),
     call(onResetSaveProductNewInfoStart),
+    call(onAddProductStart),
+    call(onResetAddProductStart),
   ]);
 }

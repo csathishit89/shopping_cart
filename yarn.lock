@@ -1759,10 +1759,10 @@
   resolved "https://registry.yarnpkg.com/@react-native-masked-view/masked-view/-/masked-view-0.3.2.tgz#7064533a573e3539ec912f59c1f457371bf49dd9"
   integrity sha512-XwuQoW7/GEgWRMovOQtX3A4PrXhyaZm0lVUiY8qJDvdngjLms9Cpdck6SmGAUNqQwcj2EadHC1HwL0bEyoa/SQ==
 
-"@react-native-picker/picker@2.9.0":
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/@react-native-picker/picker/-/picker-2.9.0.tgz#0a7053ca174ec697388cb79032fb4c1445554e07"
-  integrity sha512-khEhIW/uhfMqq/+tvg4rEAiPGT8GX+Y6QydlP2TSMSmRHoSJK+ShXvXZXSr4Sii4imkj4BwvLunGywwtQDODqg==
+"@react-native-picker/picker@^2.11.5":
+  version "2.11.5"
+  resolved "https://registry.yarnpkg.com/@react-native-picker/picker/-/picker-2.11.5.tgz#25d2860f129839696a1bf3de8122849e6d6f0c60"
+  integrity sha512-tzd+lWqKT1R17dJaHNQwxvKQWvAiPjAIOtJwfDOEiyHT65uCVJKe+vlFTVKcYgHH0O+uP+73uocHT/vDA3sM1A==
 
 "@react-native/assets-registry@0.76.9":
   version "0.76.9"

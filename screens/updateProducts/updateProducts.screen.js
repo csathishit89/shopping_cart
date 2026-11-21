@@ -94,6 +94,7 @@ export default function UpdateProductsScreen({ navigation }) {
           categoryID: ''
         };
         dispatch(getProductDataStart(getProductData));
+        navigation.navigate('ProfileMain');
         Alert.alert('Success', 'Product price saved successfully!');
       }
     } else {

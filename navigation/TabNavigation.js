@@ -20,6 +20,7 @@ import OrdersScreen from '../screens/orders/orders.screen';
 import ProfileScreen from '../screens/profile/profile.screen';
 import EditProfileScreen from '../screens/editProfile/editProfile.screen'; 
 import UpdateProductsScreen from '../screens/updateProducts/updateProducts.screen';
+import AddProductScreen from '../screens/addProduct/addProduct.screen';
 
 const headBarStyle = {
   headerTitle: '', 
@@ -97,6 +98,11 @@ function TabInventoryNavigator() {
         name="UpdateProducts"
         component={UpdateProductsScreen}
         options={headingStyle('Update Product')}
+      />
+      <ProfileStack.Screen
+        name="AddProduct"
+        component={AddProductScreen}
+        options={headingStyle('Add Product')}
       />
     </ProfileStack.Navigator>
   );

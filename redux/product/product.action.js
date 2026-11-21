@@ -45,3 +45,26 @@ export const saveProductNewInfoRespReset = () => ({
 export const saveProductNewInfoRespChanged = () => ({
   type: ProductActionType.SAVE_PRODUCT_NEW_INFO_RESPONSE_CHANGED,
 });
+
+export const addProductStart = (data) => ({
+  type: ProductActionType.ADD_PRODUCT_START,
+  payload: data,
+});
+
+export const addProductSuccess = (data) => ({
+  type: ProductActionType.ADD_PRODUCT_SUCCESS,
+  payload: data,
+});
+
+export const addProductFailure = (error) => ({
+  type: ProductActionType.ADD_PRODUCT_FAILURE,
+  payload: error,
+});
+
+export const addProductRespReset = () => ({
+  type: ProductActionType.ADD_PRODUCT_RESPONSE_RESET,
+});
+
+export const addProductRespChanged = () => ({
+  type: ProductActionType.ADD_PRODUCT_RESPONSE_CHANGED,
+});
