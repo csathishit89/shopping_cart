@@ -24,6 +24,5 @@ export const getUserDetails = (loginData) => {
     userDetailsToken: loginData,
   };
   const url = `${API_URL}GetUserDetails`;
-  console.log('GetUserDetails',data,url);
   return axios.post(url, data, { headers: { 'Content-type': 'application/json' } });
 };

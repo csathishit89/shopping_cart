@@ -431,68 +431,9 @@ export const imageUploadToS3 = async (result, path, loginData) => {
       return "Image Upload Failed";
     }
   }
-
-// } catch (error) {
-//   console.error('Caught error:', error);
-//   // return "Image Upload Failed";
-// }
-
+ 
 };
-// export const uploadPdfFile = async (result, path,loginData) => {
-//   debugger;
-//   console.log("This state: ", result);
-//   console.log("path: ", path);
 
-//   const {
-//     companyID,
-//     databaseName,
-//   } = loginData;
-
-//   let formData = new FormData();
-//   formData.append('photoimg', {
-//     uri: result.uri,
-//     name: result.name,
-//     type: result.type,
-//   });
-  
-
-//   formData.append('typeval', path);
-//   formData.append('companyID', companyID);
-//   formData.append('databaseName', databaseName);
-//   formData.append('fileFormat', 'Pdf');
- 
-//   console.log([...formData.entries()]);  // Log form data entries
-
-
-//   const response = await fetch(`${API_URL}Common/uploadImageToServer.php`, {
-//     method: 'POST',
-//     body: formData,
-   
-//   });
-  
-//     console.log("formData text: ", [...formData.entries()]);
-//     if (!response.ok) {
-//       const errorText = await response.text();
-//       console.error('Server returned an error:', errorText);
-//   } else {
-//       const responseJson = await response.json();
-//       console.log("Server response JSON: ", responseJson);
-//   }
-//   // if (!response.ok) {
-//   //   console.error('Server returned an error:');
-//   // } else {
-//   //   const responseJson = await response.json();
-//   //   if (responseJson.status === "Success") {
-//   //     return responseJson.response;
-//   //   } else if ('error_message' in responseJson) {
-//   //     return "Image Upload Failed";
-//   //   }
-//   // }
-
-//   debugger;
- 
-
-// }
 
 export const uploadPdfFile = async (file, path, loginData) => {
   // debugger;
@@ -513,8 +454,6 @@ export const uploadPdfFile = async (file, path, loginData) => {
   }
 
   const responseJson = await response.json();
-  
-  console.log("API Response:", responseJson);
   
   return responseJson; 
 };

@@ -101,7 +101,6 @@ export function* addProductSaga({ payload }) {
       effectiveDateTime: payload.effectiveDateTime,
       isActive: payload.isActive,
     };
-    console.log(jsonData);
     const tokenData = encodeJson(jsonData, key);
     const responseData = yield call(addProduct, tokenData);
     

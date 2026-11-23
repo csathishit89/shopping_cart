@@ -14,8 +14,6 @@ export const sendProductNewInfo = (productData) => {
     SaveProductNewInfoToken: productData,
   };
   const url = `${API_URL}SendProductNewInfo`;
-  console.log(data);
-  console.log(url);
   return axios.post(url, data, { headers: { 'Content-type': 'application/json' } });
 };
 
@@ -24,7 +22,5 @@ export const addProduct = (productData) => {
     AddProductDataToken: productData,
   };
   const url = `${API_URL}AddProduct`;
-  console.log(data);
-  console.log(url);
   return axios.post(url, data, { headers: { 'Content-type': 'application/json' } });
 };

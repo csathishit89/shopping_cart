@@ -101,7 +101,6 @@ export default function AddProductScreen({ navigation, route }) {
       }
     } catch (error) {
       Alert.alert('Error', 'Unable to select image.');
-      console.log(error);
     }
   };
 
@@ -259,8 +258,6 @@ export default function AddProductScreen({ navigation, route }) {
         databaseName: userRecord.DatabaseName
     };
 
-    console.log('Add Product Payload:');
-    console.log(productPayload);
     setLoginSpinner(true);
     dispatch(addProductStart(productPayload));
   };

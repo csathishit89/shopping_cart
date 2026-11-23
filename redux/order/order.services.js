@@ -6,8 +6,6 @@ export const createOrderService = (orderData) => {
     AddOrderDetailsToken: orderData,
   };
   const url = `${API_URL}AddOrder`;
-  console.log(data);
-  console.log(url);
   return axios.post(url, data, { headers: { 'Content-type': 'application/json' } });
 };
 
