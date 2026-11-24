@@ -1506,6 +1506,11 @@
     remove-trailing-slash "^0.1.0"
     uuid "^8.3.2"
 
+"@expo/schema-utils@^58.0.3":
+  version "58.0.3"
+  resolved "https://registry.yarnpkg.com/@expo/schema-utils/-/schema-utils-58.0.3.tgz#d2f7c81e617424dffea872062c6f660ae4982f1f"
+  integrity sha512-DwoMEpT3H+r1lU+YUEP10UcUW7sDKmfvgE7oA+zQeuGyi0XxDSDgRZUUZ5nOGp+lymmTicoIUKkoN7rByuI04g==
+
 "@expo/sdk-runtime-versions@^1.0.0", "@expo/sdk-runtime-versions@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@expo/sdk-runtime-versions/-/sdk-runtime-versions-1.0.1.tgz#292403988e491b444f2a8c7c0921600bcc2ae3da"
@@ -2279,7 +2284,7 @@ ajv@^6.10.0, ajv@^6.12.4:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-ajv@^8.0.1, ajv@^8.11.0:
+ajv@^8.0.1:
   version "8.20.0"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-8.20.0.tgz#304b3636add88ba7d936760dd50ece006dea95f9"
   integrity sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA==
@@ -4330,13 +4335,14 @@ expo-barcode-scanner@~13.0.1:
   dependencies:
     expo-image-loader "~4.7.0"
 
-expo-build-properties@~0.13.3:
-  version "0.13.3"
-  resolved "https://registry.yarnpkg.com/expo-build-properties/-/expo-build-properties-0.13.3.tgz#6b96d0486148fca6e74e62c7c502c0a9990931aa"
-  integrity sha512-gw7AYP+YF50Gr912BedelRDTfR4GnUEn9p5s25g4nv0hTJGWpBZdCYR5/Oi2rmCHJXxBqhPjxzV7JRh72fntLg==
+expo-build-properties@^58.0.12:
+  version "58.0.12"
+  resolved "https://registry.yarnpkg.com/expo-build-properties/-/expo-build-properties-58.0.12.tgz#f22c76da740fb2246c0272d9d90f2787c885ea16"
+  integrity sha512-Wrs1X1iz0kigrBBDs3qILxvXmANccvbsjpR937KqX0Qq7ON6ISk2uJyfz7Tb7/GFhDuJ6MAfW0jR+oryYdOhcg==
   dependencies:
-    ajv "^8.11.0"
-    semver "^7.6.0"
+    "@expo/schema-utils" "^58.0.3"
+    resolve-from "^5.0.0"
+    semver "^7.7.4"
 
 expo-camera@~16.0.18:
   version "16.0.18"

@@ -38,7 +38,7 @@ export default function OrdersScreen({ navigation }) {
 
   useEffect(() => {
     let getCustomerID=0;
-    if(userRecord.UserType=='Admin'){
+    if(userRecord.UserType=='Admin' || userRecord.UserType=='Staff'){
       getCustomerID=0;
     } else {
       getCustomerID=userRecord.UserID;
