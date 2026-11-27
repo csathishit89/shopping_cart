@@ -11,11 +11,15 @@ import { productSaga } from './product/product.sagas';
 // Order
 import { orderSaga } from './order/order.sagas';
 
+// Statistics
+import { statisticsSaga } from './statistics/statistics.sagas';
+
 export default function* rootSaga() {
 	yield all([
 		call(loginSaga),
 		call(categorySaga),
 		call(productSaga),
-		call(orderSaga)
+		call(orderSaga),
+		call(statisticsSaga),
     ]);
 }

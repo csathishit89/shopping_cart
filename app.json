@@ -8,8 +8,9 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash_screen.png",
-      "resizeMode": "cover"
+      "image": "./assets/images/aavinHomeIcon.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#FFFFFF"
     },
     "ios": {
       "supportsTablet": true
@@ -19,8 +20,7 @@
         "foregroundImage": "./assets/images/appIcon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.csathishit89.aavinShop",
-      "usesCleartextTraffic": true
+      "package": "com.csathishit89.aavinShop"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,7 +33,14 @@
     "plugins": [
       "@react-native-community/datetimepicker",
       "expo-font",
-      "expo-build-properties"        
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
     ]
   }
 }

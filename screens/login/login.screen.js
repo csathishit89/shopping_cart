@@ -18,11 +18,13 @@ import Code from '../../constants/ColorCodes';
 import styles from '../general-styles/general-styles';
 import { alertModel } from '../alert-component/alert-component.screen';
 import subStyles from './login.styles';
+import { loggedInDetails } from '../../redux/login/login.selectors';
 import { userLoginStart, addPersistDataStart, loginResponseResetStart } from '../../redux/login/login.action';
 import { selectUserLogin, selectDecodeLoginRespone } from '../../redux/login/login.selectors';
 
 const LoginScreen = ({navigation}) => {
   const dispatch = useDispatch();
+  const loginData = useSelector(loggedInDetails);
   const loginResponse = useSelector(selectUserLogin);
   const decodedResp = useSelector(selectDecodeLoginRespone);
 
@@ -34,6 +36,22 @@ const LoginScreen = ({navigation}) => {
   });
 
   const { phoneNumber, loginPassword, passwordIcon, security, isShowCompanyModel } = loginCredentials;
+
+  useEffect(() => {
+      if (loginData !== null) {
+        if (loginData.length > 0) {
+          if (loginData[0].IsLoginDone) {
+            navigation.dispatch(StackActions.replace('Home'));
+          } else {
+            navigation.dispatch(StackActions.replace('Login'));
+          }
+        } else {
+          navigation.dispatch(StackActions.replace('Login'));
+        }
+      } else {
+        navigation.dispatch(StackActions.replace('Login'));
+      }
+  }, [loginData]);
 
   useEffect(() => {
     if (loginResponse !== null) {

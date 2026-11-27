@@ -29,7 +29,7 @@ const SplashPageScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={stylesSplash.mainContainer}>
-      <Image style={stylesSplash.splashImageStyle} source={require('../../assets/images/splash_screen.png')} />
+      <Image style={stylesSplash.splashImageStyle} source={require('../../assets/images/aavinHomeIcon.png')} />
     </SafeAreaView>
   );
 };

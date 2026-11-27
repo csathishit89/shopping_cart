@@ -12,6 +12,7 @@ import {
 import styles from './dashboard.styles';
 import { useSelector, useDispatch } from 'react-redux';
 import { API_URL } from '../../redux/const';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { 
   getCategoryDataRespReset, 
@@ -44,14 +45,18 @@ export default function DashboardScreen({ navigation }) {
   }, [categoryResp]);
 
   const handleCardPress = async (item) => {
-    try {
-        const getCategoryID = String(item.CategoryID);
-        await AsyncStorage.setItem('@selected_category_id', getCategoryID);
-        navigation.navigate('Products');
-    } catch (error) {
-        console.error('Failed to save ID to storage', error);
-    }
-};
+      try {
+          const getCategoryID = String(item.CategoryID);
+          await AsyncStorage.setItem('@selected_category_id', getCategoryID);
+          navigation.navigate('Products');
+      } catch (error) {
+          console.error('Failed to save ID to storage', error);
+      }
+  };
+
+  const onStatsPress = () => {
+    navigation.navigate('StatsPage');
+  };
 
   const renderCard = ({ item }) => (
     <TouchableOpacity
@@ -76,11 +81,21 @@ export default function DashboardScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       
       <View style={styles.headerContainer}>
+        {/* Centered Logo */}
         <Image
           source={logo_image}
           style={styles.logoImage}
           resizeMode="contain"
         />
+
+        {/* Top-Right Statistics Icon */}
+        <TouchableOpacity
+          style={styles.rightIconContainer}
+          onPress={onStatsPress}
+          activeOpacity={0.7}
+        >
+          <FontAwesome name="bar-chart" size={30} color="#1C7ED6" />
+        </TouchableOpacity>
       </View>
       
       <FlatList

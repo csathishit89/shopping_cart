@@ -6,6 +6,8 @@ import loginReducer from './login/login.reducer';
 import CategoryReducer from './category/category.reducer';
 import ProductReducer from './product/product.reducer';
 import orderReducer from './order/order.reducer';
+import statisticsReducer from './statistics/statistics.reducer';
+import { statisticsSaga } from './statistics/statistics.sagas';
 
 const persistConfig = {
     key: 'root',
@@ -16,7 +18,8 @@ const rootReducer = combineReducers({
 	login: loginReducer,
   category: CategoryReducer,
   product: ProductReducer,
-  order: orderReducer
+  order: orderReducer,
+  statistics: statisticsReducer,
 });
 
 export default persistReducer(persistConfig, rootReducer);

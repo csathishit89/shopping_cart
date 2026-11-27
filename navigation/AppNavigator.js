@@ -12,7 +12,7 @@ const AppNavigator = () => {
   return (
     <NavigationContainer>
       <SwitchStack.Navigator screenOptions={{ headerShown: false }}>
-        <SwitchStack.Screen name="Splash" component={SplashNavigation} />
+        {/* <SwitchStack.Screen name="Splash" component={SplashNavigation} /> */}
         <SwitchStack.Screen name="Login" component={LoginNavigation} />
         <SwitchStack.Screen name="Home" component={TabNavigation} />
       </SwitchStack.Navigator>

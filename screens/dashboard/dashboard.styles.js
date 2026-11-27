@@ -21,6 +21,7 @@ export default StyleSheet.create({
     alignItems: 'center',     // Centers children horizontally
     justifyContent: 'center',
     paddingVertical: 10,
+    position: 'relative',
   },
   headerTitle: {
     fontSize: 24,
@@ -31,6 +32,12 @@ export default StyleSheet.create({
   logoImage: {
     width: 160,
     height: 75
+  },
+  rightIconContainer: {
+    position: 'absolute',
+    right: 16,
+    top: 18, 
+    padding: 4,
   },
   listContent: {
     paddingHorizontal: 16,

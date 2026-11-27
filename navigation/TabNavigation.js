@@ -9,6 +9,7 @@ import Code from '../constants/ColorCodes';
 
 // Dashboard
 import DashboardScreen from '../screens/dashboard/dashboard.screen';
+import StatisticsScreen from '../screens/statistics/statistics.screen';
 
 // Products
 import ProductsScreen from '../screens/products/products.screen';
@@ -45,6 +46,11 @@ function DashboardTabNavigator() {
       <DashStack.Screen
         name="DashPage"
         component={DashboardScreen}
+        options={headBarStyle}
+      />
+      <DashStack.Screen
+        name="StatsPage"
+        component={StatisticsScreen}
         options={headBarStyle}
       />
     </DashStack.Navigator>

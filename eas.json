@@ -1,25 +1,35 @@
 {
   "cli": {
-    "version": ">= 27.5.0",
-    "appVersionSource": "remote"
+    "version": ">= 13.0.0",
+    "appVersionSource": "local"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "node": "22.14.0",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://shop.hindustancreation.in"
+      }
     },
     "preview": {
-      "node": "20.18.0",
       "distribution": "internal",
+      "node": "22.14.0",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://shop.hindustancreation.in"
       }
     },
     "production": {
-      "autoIncrement": true
+      "node": "22.14.0",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://shop.hindustancreation.in"
+      }
     }
-  },
-  "submit": {
-    "production": {}
   }
 }
