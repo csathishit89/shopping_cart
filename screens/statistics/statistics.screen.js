@@ -28,16 +28,6 @@ import {
   selectTopTenProductSalesResponse, 
 } from '../../redux/statistics/statistics.selectors';
 
-// Sample fallback data (replace with API / Redux state props)
-const DEFAULT_STATS = {
-  totalOrders: 1420,
-  todayOrders: 48,
-  totalRevenue: 285400,
-  totalProfit: 64250,
-  todayRevenue: 9640,
-  todayProfit: 2180,
-};
-
 const DEFAULT_TOP_PRODUCTS = [
   { id: '1', name: 'Full Cream Milk (500ml)', qtySold: 64, stockOutCount: 3 },
   { id: '2', name: 'Standardized Milk (500ml)', qtySold: 52, stockOutCount: 2 },
@@ -56,7 +46,6 @@ const formatINR = (amount) =>
 
 export default function StatisticsScreen({
   navigation,
-  stats = DEFAULT_STATS,
   topProducts = DEFAULT_TOP_PRODUCTS,
 }) {
   const dispatch = useDispatch();
@@ -171,60 +160,56 @@ export default function StatisticsScreen({
             bgTint="#ecfdf5"
           />
         </View>
-        
-        {/* Top 10 Products Sold Out Frequently Today */}
-        <View style={styles.listCard}>
-          <View style={styles.listHeader}>
-            <FontAwesome name="fire" size={18} color="#ea580c" />
-            <Text style={styles.listTitle}>
-              Top 10 Fast-Moving / Sold Out Today
-            </Text>
-          </View>
 
-          {topProducts.slice(0, 10).map((item, index) => {
-            const isTopThree = index < 3;
-            return (
-              <View
-                key={item.id}
-                style={[
-                  styles.productRow,
-                  index === topProducts.length - 1 && styles.noBorder,
-                ]}
-              >
+        {Array.isArray(topTenProductSalesData) && topTenProductSalesData.length > 0 && (
+          <View style={styles.listCard}>
+            <View style={styles.listHeader}>
+              <FontAwesome name="fire" size={18} color="#ea580c" />
+              <Text style={styles.listTitle}>
+                Top 10 Fast-Moving / Sold Out Today
+              </Text>
+            </View>
+
+            {topTenProductSalesData.map((item, index) => {
+              const isTopThree = index < 3;
+              return (
                 <View
+                  key={item.id ?? index}
                   style={[
-                    styles.rankBadge,
-                    isTopThree ? styles.rankTop : styles.rankNormal,
+                    styles.productRow,
+                    index === topTenProductSalesData.length - 1 && styles.noBorder,
                   ]}
                 >
-                  <Text
+                  <View
                     style={[
-                      styles.rankText,
-                      isTopThree ? styles.rankTextTop : styles.rankTextNormal,
+                      styles.rankBadge,
+                      isTopThree ? styles.rankTop : styles.rankNormal,
                     ]}
                   >
-                    #{index + 1}
-                  </Text>
-                </View>
-
-                <View style={styles.productInfo}>
-                  <Text style={styles.productName} numberOfLines={1}>
-                    {item.name}
-                  </Text>
-                  {item.stockOutCount > 0 && (
-                    <Text style={styles.stockOutTag}>
-                      Sold out {item.stockOutCount}x today
+                    <Text
+                      style={[
+                        styles.rankText,
+                        isTopThree ? styles.rankTextTop : styles.rankTextNormal,
+                      ]}
+                    >
+                      #{index + 1}
                     </Text>
-                  )}
-                </View>
+                  </View>
 
-                <View style={styles.qtyBadge}>
-                  <Text style={styles.qtyText}>{item.qtySold} sold</Text>
+                  <View style={styles.productInfo}>
+                    <Text style={styles.productName} numberOfLines={1}>
+                      {item.productName}
+                    </Text>
+                  </View>
+
+                  <View style={styles.qtyBadge}>
+                    <Text style={styles.qtyText}>{item.total_quantity_sold} sold</Text>
+                  </View>
                 </View>
-              </View>
-            );
-          })}
-        </View>
+              );
+            })}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

@@ -68,7 +68,6 @@ export function* fetchTotalRevenueProfitSaga({ payload }) {
     };
     const tokenData = encodeJson(jsonData, key);
     const responseData = yield call(fetchTotalRevenueProfitService, tokenData);
-
     if (FAILURE_CODES.includes(responseData.data.statusCode)) {
       yield put(fetchTotalRevenueProfitFailure(responseData.data));
     } else {
