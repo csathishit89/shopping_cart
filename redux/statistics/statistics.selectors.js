@@ -22,6 +22,16 @@ export const selectTotalRevenueProfitResponse = createSelector(
   (statistics) => statistics.totalRevenueProfitResponse,
 );
 
+export const selectMonthRevenueProfitData = createSelector(
+  [selectStatisticsState],
+  (statistics) => statistics.monthRevenueProfitData,
+);
+
+export const selectMonthRevenueProfitResponse = createSelector(
+  [selectStatisticsState],
+  (statistics) => statistics.monthRevenueProfitResponse,
+);
+
 export const selectTopTenProductSalesData = createSelector(
   [selectStatisticsState],
   (statistics) => statistics.topTenProductSalesData,

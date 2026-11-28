@@ -9,6 +9,7 @@ import { encodeJson } from '../encode-decode';
 import {
   fetchTotalOrdersService,
   fetchTotalRevenueProfitService,
+  fetchMonthRevenueProfitService,
   fetchTopTenProductSalesService,
 } from './statistics.services';
 import {
@@ -18,6 +19,9 @@ import {
   fetchTotalRevenueProfitSuccess,
   fetchTotalRevenueProfitFailure,
   fetchTotalRevenueProfitRespChanged,
+  fetchMonthRevenueProfitSuccess,
+  fetchMonthRevenueProfitFailure,
+  fetchMonthRevenueProfitRespChanged,
   fetchTopTenProductSalesSuccess,
   fetchTopTenProductSalesFailure,
   fetchTopTenProductSalesRespChanged,
@@ -96,6 +100,45 @@ export function* onResetFetchTotalRevenueProfitStart() {
   );
 }
 
+export function* fetchMonthRevenueProfitSaga({ payload }) {
+  try {
+    const key = 'FetchTotalRevenueProfitForMonthKey';
+    const jsonData = {
+      ShopID: payload.ShopID ?? payload.shopID,
+      Month: payload.Month ?? payload.month,
+      DatabaseName: payload.DatabaseName ?? payload.databaseName,
+      Secratekey: key,
+    }; 
+    const tokenData = encodeJson(jsonData, key);
+    const responseData = yield call(fetchMonthRevenueProfitService, tokenData);
+    if (responseData.data.statusCode === '100' || responseData.data.statusCode === '102' || responseData.data.statusCode === '111') {
+      yield put(fetchMonthRevenueProfitFailure(responseData.data));
+    } else {
+      yield put(fetchMonthRevenueProfitSuccess(responseData.data));
+    }
+  } catch (error) {
+    yield put(fetchMonthRevenueProfitFailure(error));
+  }
+}
+
+export function* fetchMonthRevenueProfitResetSaga() {
+  yield put(fetchMonthRevenueProfitRespChanged());
+}
+
+export function* onFetchMonthRevenueProfitStart() {
+  yield takeLatest(
+    StatisticsActionType.FETCH_MONTH_REVENUE_PROFIT_START,
+    fetchMonthRevenueProfitSaga,
+  );
+}
+
+export function* onResetFetchMonthRevenueProfitStart() {
+  yield takeLatest(
+    StatisticsActionType.FETCH_MONTH_REVENUE_PROFIT_RESPONSE_RESET,
+    fetchMonthRevenueProfitResetSaga,
+  );
+}
+
 export function* fetchTopTenProductSalesSaga({ payload }) {
   try {
     const key = 'FetchTopTenProdutSalesInfoKey';
@@ -141,6 +184,8 @@ export function* statisticsSaga() {
     call(onResetFetchTotalOrdersStart),
     call(onFetchTotalRevenueProfitStart),
     call(onResetFetchTotalRevenueProfitStart),
+    call(onFetchMonthRevenueProfitStart),
+    call(onResetFetchMonthRevenueProfitStart),
     call(onFetchTopTenProductSalesStart),
     call(onResetFetchTopTenProductSalesStart),
   ]);

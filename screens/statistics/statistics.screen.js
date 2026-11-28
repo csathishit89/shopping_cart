@@ -1,90 +1,152 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
   Text,
   ScrollView,
   TouchableOpacity,
-  StyleSheet,
+  Modal,
+  FlatList,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useSelector, useDispatch } from 'react-redux';
+import styles from './statistics.styles';
 import { loggedInDetails } from '../../redux/login/login.selectors';
-import { 
-  fetchTotalOrdersRespReset, 
+import {
+  fetchTotalOrdersRespReset,
   fetchTotalOrdersStart,
   fetchTotalRevenueProfitRespReset,
   fetchTotalRevenueProfitStart,
+  fetchMonthRevenueProfitRespReset,
+  fetchMonthRevenueProfitStart,
   fetchTopTenProductSalesRespReset,
   fetchTopTenProductSalesStart,
 } from '../../redux/statistics/statistics.action';
-
-import { 
-  selectTotalOrdersData, 
-  selectTotalOrdersResponse, 
-  selectTotalRevenueProfitData, 
-  selectTotalRevenueProfitResponse, 
-  selectTopTenProductSalesData, 
-  selectTopTenProductSalesResponse, 
+import {
+  selectTotalOrdersData,
+  selectTotalOrdersResponse,
+  selectTotalRevenueProfitData,
+  selectTotalRevenueProfitResponse,
+  selectMonthRevenueProfitData,
+  selectMonthRevenueProfitResponse,
+  selectTopTenProductSalesData,
+  selectTopTenProductSalesResponse,
 } from '../../redux/statistics/statistics.selectors';
 
-const DEFAULT_TOP_PRODUCTS = [
-  { id: '1', name: 'Full Cream Milk (500ml)', qtySold: 64, stockOutCount: 3 },
-  { id: '2', name: 'Standardized Milk (500ml)', qtySold: 52, stockOutCount: 2 },
-  { id: '3', name: 'Curd Pouch (400g)', qtySold: 41, stockOutCount: 2 },
-  { id: '4', name: 'Toned Milk (500ml)', qtySold: 38, stockOutCount: 1 },
-  { id: '5', name: 'Butter Milk (200ml)', qtySold: 35, stockOutCount: 2 },
-  { id: '6', name: 'Ghee Jar (500ml)', qtySold: 22, stockOutCount: 1 },
-  { id: '7', name: 'Paneer Fresh (200g)', qtySold: 19, stockOutCount: 1 },
-  { id: '8', name: 'Badam Milk Bottle (200ml)', qtySold: 17, stockOutCount: 1 },
-  { id: '9', name: 'Mysore Pak Box (250g)', qtySold: 14, stockOutCount: 0 },
-  { id: '10', name: 'Mango Lassi (200ml)', qtySold: 12, stockOutCount: 0 },
+const MONTHS = [
+  { label: 'January', short: 'Jan', value: 1 },
+  { label: 'February', short: 'Feb', value: 2 },
+  { label: 'March', short: 'Mar', value: 3 },
+  { label: 'April', short: 'Apr', value: 4 },
+  { label: 'May', short: 'May', value: 5 },
+  { label: 'June', short: 'Jun', value: 6 },
+  { label: 'July', short: 'Jul', value: 7 },
+  { label: 'August', short: 'Aug', value: 8 },
+  { label: 'September', short: 'Sep', value: 9 },
+  { label: 'October', short: 'Oct', value: 10 },
+  { label: 'November', short: 'Nov', value: 11 },
+  { label: 'December', short: 'Dec', value: 12 },
 ];
+
+const EMPTY_MONTH_STATS = {
+  month_revenue: 0,
+  month_profit: 0,
+};
 
 const formatINR = (amount) =>
   `₹${Number(amount || 0).toLocaleString('en-IN')}`;
 
-export default function StatisticsScreen({
-  navigation,
-  topProducts = DEFAULT_TOP_PRODUCTS,
-}) {
+const normalizeMonthStats = (rawData) => {
+  if (!rawData) {
+    return EMPTY_MONTH_STATS;
+  }
+  const record = Array.isArray(rawData) ? rawData[0] : rawData;
+  if (!record || typeof record !== 'object') {
+    return EMPTY_MONTH_STATS;
+  }
+  return {
+    month_revenue: Number(record.month_revenue) || 0,
+    month_profit: Number(record.month_profit) || 0,
+  };
+};
+
+export default function StatisticsScreen({ navigation }) {
   const dispatch = useDispatch();
   const loginData = useSelector(loggedInDetails);
-  const userRecord = (loginData && loginData.length > 0) ? loginData[0] : {};
+  const userRecord = loginData && loginData.length > 0 ? loginData[0] : {};
+
+  const currentMonthValue = new Date().getMonth() + 1;
+  const [selectedMonth, setSelectedMonth] = useState(
+    MONTHS.find((m) => m.value === currentMonthValue) || MONTHS[0]
+  );
+  const [monthDropdownVisible, setMonthDropdownVisible] = useState(false);
+  const [monthStats, setMonthStats] = useState(EMPTY_MONTH_STATS);
+
   const totalOrdersResponse = useSelector(selectTotalOrdersResponse);
-  const totalOrdersData = useSelector(selectTotalOrdersData) || [];
+  const totalOrdersData = useSelector(selectTotalOrdersData) || {};
   const totalRevenueProfitResponse = useSelector(selectTotalRevenueProfitResponse);
-  const totalRevenueProfitData = useSelector(selectTotalRevenueProfitData) || [];
+  const totalRevenueProfitData = useSelector(selectTotalRevenueProfitData) || {};
+  const monthRevenueProfitResponse = useSelector(selectMonthRevenueProfitResponse);
+  const monthRevenueProfitData = useSelector(selectMonthRevenueProfitData);
   const topTenProductSalesResponse = useSelector(selectTopTenProductSalesResponse);
   const topTenProductSalesData = useSelector(selectTopTenProductSalesData) || [];
 
   useEffect(() => {
-    const getTotalOrdersData = {
+    const basePayload = {
       shopID: userRecord.ShopID,
-      databaseName: 'General'
+      databaseName: 'General',
     };
-    dispatch(fetchTotalOrdersStart(getTotalOrdersData));
-    dispatch(fetchTotalRevenueProfitStart(getTotalOrdersData));
-    dispatch(fetchTopTenProductSalesStart(getTotalOrdersData));
-  }, []);
+    const monthPayload = {
+      ...basePayload,
+      month: selectedMonth.value,
+    };
+
+    dispatch(fetchTotalOrdersStart(basePayload));
+    dispatch(fetchTotalRevenueProfitStart(basePayload));
+    dispatch(fetchMonthRevenueProfitStart(monthPayload));
+    dispatch(fetchTopTenProductSalesStart(basePayload));
+  }, [dispatch, userRecord.ShopID]);
 
   useEffect(() => {
     if (totalOrdersResponse !== null) {
-      console.log(totalOrdersData);
-      dispatch(fetchTotalOrdersRespReset())
+      dispatch(fetchTotalOrdersRespReset());
     }
 
     if (totalRevenueProfitResponse !== null) {
-      console.log(totalRevenueProfitData);
-      dispatch(fetchTotalRevenueProfitRespReset())
+      dispatch(fetchTotalRevenueProfitRespReset());
+    }
+
+    if (monthRevenueProfitResponse !== null) {
+      setMonthStats(normalizeMonthStats(monthRevenueProfitData));
+      dispatch(fetchMonthRevenueProfitRespReset());
     }
 
     if (topTenProductSalesResponse !== null) {
-      console.log(topTenProductSalesData);
-      dispatch(fetchTopTenProductSalesRespReset())
+      dispatch(fetchTopTenProductSalesRespReset());
     }
-  }, [totalOrdersResponse, totalRevenueProfitResponse, topTenProductSalesResponse]);
-  
+  }, [
+    dispatch,
+    totalOrdersResponse,
+    totalRevenueProfitResponse,
+    monthRevenueProfitResponse,
+    topTenProductSalesResponse,
+  ]);
+
+  const handleSelectMonth = (monthItem) => {
+    setSelectedMonth(monthItem);
+    setMonthStats(EMPTY_MONTH_STATS);
+    setMonthDropdownVisible(false);
+
+    const getMonthOrderData = {
+      shopID: userRecord.ShopID,
+      month: monthItem.value,
+      databaseName: 'General',
+    };
+
+    console.log(getMonthOrderData);
+    dispatch(fetchMonthRevenueProfitStart(getMonthOrderData));
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -109,14 +171,14 @@ export default function StatisticsScreen({
         <View style={styles.row}>
           <StatCard
             title="Total Orders"
-            value={totalOrdersData.total_orders}
+            value={totalOrdersData.total_orders ?? 0}
             icon="shopping-bag"
             iconColor="#2563eb"
             bgTint="#eff6ff"
           />
           <StatCard
             title="Today Orders"
-            value={totalOrdersData.today_orders}
+            value={totalOrdersData.today_orders ?? 0}
             icon="calendar-check-o"
             iconColor="#0284c7"
             bgTint="#f0f9ff"
@@ -158,6 +220,40 @@ export default function StatisticsScreen({
             icon="area-chart"
             iconColor="#059669"
             bgTint="#ecfdf5"
+          />
+        </View>
+
+        {/* Row 4: Month Revenue & Profit with Month Dropdown */}
+        <View style={styles.sectionHeaderRow}>
+          <Text style={[styles.sectionLabel, { marginBottom: 0, marginTop: 0 }]}>
+            Month's Performance
+          </Text>
+
+          <TouchableOpacity
+            style={styles.dropdownTrigger}
+            onPress={() => setMonthDropdownVisible(true)}
+            activeOpacity={0.7}
+          >
+            <FontAwesome name="calendar" size={13} color="#4f46e5" />
+            <Text style={styles.dropdownTriggerText}>{selectedMonth.label}</Text>
+            <FontAwesome name="chevron-down" size={11} color="#475569" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.row}>
+          <StatCard
+            title={`${selectedMonth.short} Revenue`}
+            value={formatINR(monthStats.month_revenue)}
+            icon="calendar"
+            iconColor="#4f46e5"
+            bgTint="#eef2ff"
+          />
+          <StatCard
+            title={`${selectedMonth.short} Profit`}
+            value={formatINR(monthStats.month_profit)}
+            icon="money"
+            iconColor="#0d9488"
+            bgTint="#f0fdfa"
           />
         </View>
 
@@ -211,6 +307,58 @@ export default function StatisticsScreen({
           </View>
         )}
       </ScrollView>
+
+      {/* Month Picker Modal */}
+      <Modal
+        visible={monthDropdownVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setMonthDropdownVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setMonthDropdownVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Month</Text>
+              <TouchableOpacity onPress={() => setMonthDropdownVisible(false)}>
+                <FontAwesome name="times" size={18} color="#64748b" />
+              </TouchableOpacity>
+            </View>
+
+            <FlatList
+              data={MONTHS}
+              keyExtractor={(item) => String(item.value)}
+              renderItem={({ item }) => {
+                const isSelected = item.value === selectedMonth.value;
+                return (
+                  <TouchableOpacity
+                    style={[
+                      styles.monthOption,
+                      isSelected && styles.monthOptionSelected,
+                    ]}
+                    onPress={() => handleSelectMonth(item)}
+                  >
+                    <Text
+                      style={[
+                        styles.monthOptionText,
+                        isSelected && styles.monthOptionTextSelected,
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                    {isSelected && (
+                      <FontAwesome name="check" size={14} color="#4f46e5" />
+                    )}
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -226,163 +374,3 @@ function StatCard({ title, value, icon, iconColor, bgTint }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    height: 56,
-    backgroundColor: '#ffffff',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-    position: 'relative',
-  },
-  backBtn: {
-    position: 'absolute',
-    left: 16,
-    padding: 6,
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-  sectionLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#64748b',
-    marginBottom: 8,
-    marginTop: 6,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginBottom: 12,
-  },
-  card: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  iconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  cardTitle: {
-    fontSize: 13,
-    color: '#64748b',
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  cardValue: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  listCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  listHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 14,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
-  },
-  listTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  productRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
-  },
-  noBorder: {
-    borderBottomWidth: 0,
-  },
-  rankBadge: {
-    width: 30,
-    height: 30,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  rankTop: {
-    backgroundColor: '#ffedd5',
-  },
-  rankNormal: {
-    backgroundColor: '#f1f5f9',
-  },
-  rankText: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  rankTextTop: {
-    color: '#c2410c',
-  },
-  rankTextNormal: {
-    color: '#475569',
-  },
-  productInfo: {
-    flex: 1,
-    paddingRight: 8,
-  },
-  productName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1e293b',
-  },
-  stockOutTag: {
-    fontSize: 11,
-    color: '#dc2626',
-    fontWeight: '500',
-    marginTop: 2,
-  },
-  qtyBadge: {
-    backgroundColor: '#eff6ff',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-  },
-  qtyText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#2563eb',
-  },
-});

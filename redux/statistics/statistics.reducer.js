@@ -6,6 +6,8 @@ const INITIAL_STATE = {
   totalOrdersData: null,
   totalRevenueProfitResponse: null,
   totalRevenueProfitData: null,
+  monthRevenueProfitResponse: null,
+  monthRevenueProfitData: null,
   topTenProductSalesResponse: null,
   topTenProductSalesData: null,
 };
@@ -40,6 +42,22 @@ const statisticsReducer = (state = INITIAL_STATE, action) => {
 
     case StatisticsActionType.FETCH_TOTAL_REVENUE_PROFIT_RESPONSE_CHANGED:
       return { ...state, totalRevenueProfitResponse: null };
+
+    case StatisticsActionType.FETCH_MONTH_REVENUE_PROFIT_SUCCESS:
+      return {
+        ...state,
+        monthRevenueProfitResponse: action.payload,
+        monthRevenueProfitData: decodeApiResponse(
+          action.payload,
+          'FetchTotalRevenueProfitForMonthKey',
+        ),
+      };
+
+    case StatisticsActionType.FETCH_MONTH_REVENUE_PROFIT_FAILURE:
+      return { ...state, monthRevenueProfitResponse: action.payload, monthRevenueProfitData: [] };
+
+    case StatisticsActionType.FETCH_MONTH_REVENUE_PROFIT_RESPONSE_CHANGED:
+      return { ...state, monthRevenueProfitResponse: null };
 
     case StatisticsActionType.FETCH_TOP_TEN_PRODUCT_SALES_SUCCESS:
       return {

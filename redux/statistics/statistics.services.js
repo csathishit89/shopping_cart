@@ -17,6 +17,14 @@ export const fetchTotalRevenueProfitService = (token) => {
   return axios.post(url, data, { headers: { 'Content-type': 'application/json' } });
 };
 
+export const fetchMonthRevenueProfitService = (token) => {
+  const data = {
+    FetchTotalRevenueProfitForMonthToken: token,
+  };
+  const url = `${API_URL}FetchTotalRevenueProfitForMonth`;
+  return axios.post(url, data, { headers: { 'Content-type': 'application/json' } });
+};
+
 export const fetchTopTenProductSalesService = (token) => {
   const data = {
     FetchTopTenProdutSalesToken: token,

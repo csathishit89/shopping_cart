@@ -48,6 +48,29 @@ export const fetchTotalRevenueProfitRespChanged = () => ({
   type: StatisticsActionType.FETCH_TOTAL_REVENUE_PROFIT_RESPONSE_CHANGED,
 });
 
+export const fetchMonthRevenueProfitStart = (data) => ({
+  type: StatisticsActionType.FETCH_MONTH_REVENUE_PROFIT_START,
+  payload: data,
+});
+
+export const fetchMonthRevenueProfitSuccess = (data) => ({
+  type: StatisticsActionType.FETCH_MONTH_REVENUE_PROFIT_SUCCESS,
+  payload: data,
+});
+
+export const fetchMonthRevenueProfitFailure = (error) => ({
+  type: StatisticsActionType.FETCH_MONTH_REVENUE_PROFIT_FAILURE,
+  payload: error,
+});
+
+export const fetchMonthRevenueProfitRespReset = () => ({
+  type: StatisticsActionType.FETCH_MONTH_REVENUE_PROFIT_RESPONSE_RESET,
+});
+
+export const fetchMonthRevenueProfitRespChanged = () => ({
+  type: StatisticsActionType.FETCH_MONTH_REVENUE_PROFIT_RESPONSE_CHANGED,
+});
+
 // Top Ten Product Sales
 export const fetchTopTenProductSalesStart = (data) => ({
   type: StatisticsActionType.FETCH_TOP_TEN_PRODUCT_SALES_START,
